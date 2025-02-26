@@ -52,10 +52,10 @@ This script is designed to showcase the following:
 |------------------------|-----------------------------------|
 | Control Flow           | `if`, `elif`, `else`, `for`, `while`, `break` |
 | Exception Handling     | `try`, `except`, `finally`        |
-| Functions & Classes    | `def`, `return`, `class`          |
+| Functions & Classes    | `def`, `return`          |
 | Variable & Scope       | `global`, `nonlocal`              |
 | Import & Modules       | `import`, `from`, `as`            |
-| Object-Oriented (OOP)  | `del`, `class`, `object`, `issubclass`, `isinstance` |
+| Object-Oriented (OOP)  | `del`, `class`, `object`|
 
 ---
 
