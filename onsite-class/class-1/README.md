@@ -69,9 +69,9 @@ python --version
 ```
 
 ## Usage
-To run a Python app, use:
+To run a Python script, use:
 ```sh
-python script.py
+python app.py
 ```
 
 ## Contributing
