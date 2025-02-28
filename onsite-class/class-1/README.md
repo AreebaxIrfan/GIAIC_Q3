@@ -69,7 +69,7 @@ python --version
 ```
 
 ## Usage
-To run a Python script, use:
+To run a Python app, use:
 ```sh
 python script.py
 ```
@@ -77,8 +77,6 @@ python script.py
 ## Contributing
 Contributions are welcome! If you'd like to contribute, please fork the repository and submit a pull request.
 
-## License
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
 **Happy Coding!** 🚀
