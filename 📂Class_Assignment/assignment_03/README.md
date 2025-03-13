@@ -1,20 +1,52 @@
-# Python Basics Assignment _03
+# Python Basics Assignment 03
 
-Welcome to the Python Basics repository! This collection of examples covers key programming concepts in Python in a concise, easy-to-read, and interesting way. Below you'll find code samples for lists, tuples, dictionaries, sets, frozensets, and control flow & loops.
+A collection of Python examples covering control flow, loops, and data structures.
 
 ## Table of Contents
-- [Lesson 05: Control Flow & Loops](#lesson-05-control-flow--loops)
-- [Lesson 06: Lists, Tuples & Dictionary](#lesson-06-lists-tuples--dictionary)
-- [Lesson 07: The Set & Frozenset](#lesson-07-the-set--frozenset)
+- [Control Flow & Loops](#control-flow--loops)
+- [Lists, Tuples & Dictionaries](#lists-tuples--dictionaries)
+- [Sets & Frozensets](#sets--frozensets)
 
 ---
 
-## Lesson 05: Control Flow & Loops
+## Control Flow & Loops
 
-### Voting Eligibility Example
-```python
-age = int(input("Enter your age: "))
-if age >= 18:
-    print("You are eligible to vote")
-else:
-    print("You are not eligible to vote")
+**Key Concepts:**  
+- `if-else` statements, `for` loops, and conditional logic.
+
+**Examples:**  
+1. **Voting Eligibility Check**: Uses `if-else` to determine voting eligibility based on age.
+2. **Grade Assignment**: Uses `if-elif-else` inside a loop to assign grades to scores.
+3. **Simple Loop**: Iterates 5 times with `range()`.
+
+---
+
+## Lists, Tuples & Dictionaries
+
+### Lists
+- **Mutable**, ordered collections.
+- **Examples**: Create, access, and modify items.
+
+### Tuples
+- **Immutable**, ordered collections.
+- **Examples**: Create and access items.
+
+### Dictionaries
+- **Key-value pairs**, mutable, and unordered.
+- **Examples**: Create, access values by keys.
+
+---
+
+## Sets & Frozensets
+
+### Sets
+- **Unique**, unordered, mutable elements.
+- **Operations**: Add (`add()`), remove (`discard()`), and more.
+
+### Frozensets
+- **Immutable** version of sets.
+- **Operations**: Cannot be modified after creation.
+
+---
+
+Explore the code examples to understand these concepts. Modify and experiment with them to deepen your understanding. Happy coding! 🐍
