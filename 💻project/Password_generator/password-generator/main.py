@@ -1,26 +1,63 @@
 import streamlit as st
-import random
-import string
+import re
 
-def generate_password(length, use_digits , use_special):
-    characters = string.ascii_letters
+# Function to check password strength
+def check_password_strength(password):
+    strength = 0
+    feedback = []
 
-    if use_digits:
-        characters += string.digits 
+    # Check length
+    if len(password) >= 8:
+        strength += 1
+    else:
+        feedback.append("Password should be at least 7 characters long.")
+     # Check for uppercase letters
+    if any(char.isupper() for char in password):
+        strength += 1
+    else:
+        feedback.append("Include at least one uppercase letter.")
 
-    if use_special:
-        characters += string.punctuation
-    
-    return ''.join(random.choice(characters) for _ in range(length))
+    # Check for lowercase letters
+    if any(char.islower() for char in password):
+        strength += 1
+    else:
+        feedback.append("Include at least one lowercase letter.")
 
-st.title("Password Generator")
-length = st.slider("length of password",  min_value=6, max_value=32 , value=12)
+    # Check for numbers
+    if any(char.isdigit() for char in password):
+        strength += 1
+    else:
+        feedback.append("Include at least one number.")
 
-use_digits = st.checkbox("Use digits")
-use_special = st.checkbox("Use special characters")
+    # Check for special characters
+    if re.search(r"[!@#$%^&*(),.?\":{}|<>]", password):
+        strength += 1
+    else:
+        feedback.append("Include at least one special character (!@#$%^&* etc.).")
 
-if st.button("Generate Password"):
-    password = generate_password(length, use_digits, use_special)
-    st.write(f"Genrate Password: {password}")
+    return strength, feedback
 
-st.write('---------------------')
+# Streamlit App UI
+st.title("🔒 Password Strength Checker")
+
+password = st.text_input("Enter your password:", type="password")
+
+if password:
+    strength, feedback = check_password_strength(password)
+
+    # Display password strength
+    st.subheader("Password Strength:")
+    if strength == 5:
+        st.success("Strong Password ✅")
+    elif strength == 4:
+        st.info("Good Password need improvement 👍")
+    elif strength >= 3:
+        st.warning("Moderate Password ⚠")
+    else:
+        st.error("Weak Password ❌")
+
+    # Show feedback
+    if feedback:
+        st.subheader("improvement tips:")
+        for tip in feedback:
+            st.write("- " + tip)
