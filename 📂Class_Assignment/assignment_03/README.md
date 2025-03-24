@@ -6,6 +6,7 @@ A collection of Python examples covering control flow, loops, and data structure
 - [Control Flow & Loops](#control-flow--loops)
 - [Lists, Tuples & Dictionaries](#lists-tuples--dictionaries)
 - [Sets & Frozensets](#sets--frozensets)
+- [Interactive Playground](#interactive-playground)
 
 ---
 
@@ -14,39 +15,35 @@ A collection of Python examples covering control flow, loops, and data structure
 **Key Concepts:**  
 - `if-else` statements, `for` loops, and conditional logic.
 
-**Examples:**  
-1. **Voting Eligibility Check**: Uses `if-else` to determine voting eligibility based on age.
-2. **Grade Assignment**: Uses `if-elif-else` inside a loop to assign grades to scores.
-3. **Simple Loop**: Iterates 5 times with `range()`.
+<details>
+  <summary><strong>Click to expand examples</strong></summary>
 
----
+  **Examples:**  
+  1. **Voting Eligibility Check**: Uses `if-else` to determine voting eligibility based on age.
+  2. **Grade Assignment**: Uses `if-elif-else` inside a loop to assign grades to scores.
+  3. **Simple Loop**: Iterates 5 times with `range()`.
 
-## Lists, Tuples & Dictionaries
-
-### Lists
-- **Mutable**, ordered collections.
-- **Examples**: Create, access, and modify items.
-
-### Tuples
-- **Immutable**, ordered collections.
-- **Examples**: Create and access items.
-
-### Dictionaries
-- **Key-value pairs**, mutable, and unordered.
-- **Examples**: Create, access values by keys.
-
----
-
-## Sets & Frozensets
-
-### Sets
-- **Unique**, unordered, mutable elements.
-- **Operations**: Add (`add()`), remove (`discard()`), and more.
-
-### Frozensets
-- **Immutable** version of sets.
-- **Operations**: Cannot be modified after creation.
-
----
-
-Explore the code examples to understand these concepts. Modify and experiment with them to deepen your understanding. Happy coding! 🐍
+  ```python
+  # Voting Eligibility Check Example
+  age = int(input("Enter your age: "))
+  if age >= 18:
+      print("You are eligible to vote.")
+  else:
+      print("You are not eligible to vote.")
+  
+  # Grade Assignment Example
+  scores = [88, 76, 92, 67, 85]
+  for score in scores:
+      if score >= 90:
+          grade = 'A'
+      elif score >= 80:
+          grade = 'B'
+      elif score >= 70:
+          grade = 'C'
+      else:
+          grade = 'D'
+      print(f"Score: {score}, Grade: {grade}")
+  
+  # Simple Loop Example
+  for i in range(5):
+      print(f"Iteration {i+1}")
