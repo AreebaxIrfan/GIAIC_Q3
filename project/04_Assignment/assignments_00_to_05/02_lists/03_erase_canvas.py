@@ -19,7 +19,7 @@ def erase_objects(canvas, eraser):
     left_x = mouse_x
     top_y = mouse_y
     right_x = left_x + ERASE_SIZE
-    bottom_y = left_y + ERASE_SIZE
+    bottom_y = top_y + ERASE_SIZE
 
     overlapping_objects = canvas.find_overlappng(left_x, top_y, right_x, bottom_y)
 
