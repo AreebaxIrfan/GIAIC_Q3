@@ -8,7 +8,7 @@ def get_lst():
     prompts the user to enter on elemnt of the list ata  atime return teh first resulting list
     """
     lst = []
-    elem:str= input("Enter an elemet sof the list and press the enter: ")
+    elem:str= input("Enter an element of the list and press the enter: ")
     while elem != "":
         lst.append(elem)
         elem = input("Please enter an element o f teh list and press enter to stop")
