@@ -1,5 +1,4 @@
 # Guess My Number
-
 # I am thinking of a number between 0 and 99... Enter a guess: 50 Your guess is too high
 import random
 def main():
