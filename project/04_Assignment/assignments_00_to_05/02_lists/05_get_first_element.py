@@ -2,7 +2,6 @@
 def get_first_element(lst):
     """Print the first elemts of a provided list"""
     print(lst[0])
-
 def get_lst():
     """
     prompts the user to enter on elemnt of the list ata  atime return teh first resulting list
