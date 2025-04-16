@@ -5,285 +5,189 @@ import time
 from cryptography.fernet import Fernet
 from base64 import urlsafe_b64encode
 from hashlib import pbkdf2_hmac
-from typing import Dict, List, Optional
 
-# Constants
-DATA_FILE = "vault_data.json"
-KEY_FILE = "encryption_key.key"
-MAX_LOGIN_ATTEMPTS = 3
-LOCKOUT_DURATION_SEC = 300  # 5 minutes
-DEFAULT_SALT = "secure_salt_value"  # In production, use unique salt per user
-PBKDF2_ITERATIONS = 100_000
+DATA_FILE = "store_data.json"
+KEY_FILE = "fernet_key.key"
+MAX_ATTEMPTS = 3
+LOCKOUT_DURATION = 300  # 5 mnts
 
-# Type aliases
-VaultData = Dict[str, Dict]
-UserEntries = List[Dict[str, str]]
+# Load data
+stored_data = {}
+if os.path.exists(DATA_FILE):
+    with open(DATA_FILE, "r") as f:
+        stored_data = json.load(f)
 
-class VaultManager:
-    """Handles data encryption, storage, and user authentication."""
-    
-    def __init__(self):
-        self.cipher = Fernet(self._load_or_create_key())
-        self.stored_data = self._load_data()
-        
-    @staticmethod
-    def _load_data() -> VaultData:
-        """Load existing data from file or return empty dict."""
-        if os.path.exists(DATA_FILE):
-            with open(DATA_FILE, "r") as f:
-                return json.load(f)
-        return {}
+# Session state setup
+if "failed_attempts" not in st.session_state:
+    st.session_state.failed_attempts = 0
+if "lockout_time" not in st.session_state:
+    st.session_state.lockout_time = 0
+if "current_user" not in st.session_state:
+    st.session_state.current_user = None
 
-    @staticmethod
-    def _load_or_create_key() -> bytes:
-        """Load existing encryption key or generate a new one."""
-        if os.path.exists(KEY_FILE):
-            with open(KEY_FILE, "rb") as key_file:
-                return key_file.read()
-        
-        new_key = Fernet.generate_key()
-        with open(KEY_FILE, "wb") as key_file:
-            key_file.write(new_key)
-        return new_key
+# Fernet key
+def load_fernet_key():
+    if os.path.exists(KEY_FILE):
+        with open(KEY_FILE, "rb") as key_file:
+            return key_file.read()
+    key = Fernet.generate_key()
+    with open(KEY_FILE, "wb") as key_file:
+        key_file.write(key)
+    return key
 
-    def save_data(self) -> None:
-        """Persist all data to disk."""
-        with open(DATA_FILE, "w") as f:
-            json.dump(self.stored_data, f)
+cipher = Fernet(load_fernet_key())
 
-    @staticmethod
-    def hash_passkey(passkey: str, salt: str = DEFAULT_SALT) -> str:
-        """Securely hash passkey using PBKDF2."""
-        derived_key = pbkdf2_hmac(
-            'sha256',
-            passkey.encode(),
-            salt.encode(),
-            PBKDF2_ITERATIONS,
-            dklen=32
-        )
-        return urlsafe_b64encode(derived_key).decode()
+# Hash passkey
+def hash_passkey(passkey, salt="somesalt", iterations=100_000):
+    return urlsafe_b64encode(pbkdf2_hmac('sha256', passkey.encode(), salt.encode(), iterations, dklen=32)).decode()
 
-    def encrypt_data(self, plaintext: str) -> str:
-        """Encrypt sensitive data."""
-        return self.cipher.encrypt(plaintext.encode()).decode()
+# Encryption/Decryption
+def encrypt_data(text):
+    return cipher.encrypt(text.encode()).decode()
 
-    def decrypt_data(self, ciphertext: str) -> str:
-        """Decrypt stored data."""
-        return self.cipher.decrypt(ciphertext.encode()).decode()
+def decrypt_data(encrypted_text):
+    return cipher.decrypt(encrypted_text.encode()).decode()
 
-class AuthManager:
-    """Handles user authentication and session state."""
-    
-    def __init__(self):
-        if "auth" not in st.session_state:
-            st.session_state.auth = {
-                "failed_attempts": 0,
-                "lockout_time": 0,
-                "current_user": None
-            }
+# Save data
+def save_data():
+    with open(DATA_FILE, "w") as f:
+        json.dump(stored_data, f)
 
-    @property
-    def current_user(self) -> Optional[str]:
-        return st.session_state.auth["current_user"]
+# Lockout check
+def is_locked_out():
+    if st.session_state.failed_attempts >= MAX_ATTEMPTS:
+        if time.time() - st.session_state.lockout_time < LOCKOUT_DURATION:
+            return True
+        st.session_state.failed_attempts = 0
+    return False
 
-    @current_user.setter
-    def current_user(self, value: Optional[str]):
-        st.session_state.auth["current_user"] = value
+# UI
+st.set_page_config(page_title="VaultLock", page_icon="🛡️", layout="centered")
+st.markdown("# 🛡️ Secure Data Encryption System")
 
-    def is_locked_out(self) -> bool:
-        """Check if account is temporarily locked due to failed attempts."""
-        auth = st.session_state.auth
-        if auth["failed_attempts"] >= MAX_LOGIN_ATTEMPTS:
-            if time.time() - auth["lockout_time"] < LOCKOUT_DURATION_SEC:
-                return True
-            auth["failed_attempts"] = 0  # Reset after lockout period
-        return False
+if st.session_state.current_user:
+    st.success(f"👤 Logged in as: {st.session_state.current_user}")
 
-    def record_failed_attempt(self) -> None:
-        """Track failed login attempts and enforce lockout if needed."""
-        st.session_state.auth["failed_attempts"] += 1
-        if st.session_state.auth["failed_attempts"] >= MAX_LOGIN_ATTEMPTS:
-            st.session_state.auth["lockout_time"] = time.time()
+menu = ["Home", "Account", "Store Data", "Retrieve Data"]
+if st.session_state.current_user:
+    menu.append("Logout")
 
-    def reset_attempts(self) -> None:
-        """Reset failed attempt counter."""
-        st.session_state.auth["failed_attempts"] = 0
+choice = st.sidebar.selectbox("Navigation", menu)
 
-# Initialize components
-vault = VaultManager()
-auth = AuthManager()
+# Home Page
+if choice == "Home":
+    st.markdown("**VaultLock** keeps your data safe and private with encryption.")
+    st.markdown("### 💡 Key Features:")
+    st.info("- Encrypt & store confidential data.\n- Access securely.\n- Organize entries.\n- Zero visibility policy.")
+    st.markdown("✅ Ready? Go to **Account** to register or log in.")
 
-# UI Configuration
-st.set_page_config(
-    page_title="VaultLock Secure Storage",
-    page_icon="🔒",
-    layout="centered"
-)
+# Account Page
+elif choice == "Account":
+    st.markdown("## 👤 Account")
+    is_register = st.checkbox("New user? Register")
 
-# Helper functions
-def show_login_form(vault: VaultManager) -> None:
-    """Render the login/registration interface."""
-    tab_login, tab_register = st.tabs(["🔑 Login", "📝 Register"])
-    
-    with tab_login:
-        username = st.text_input("Username", key="login_user")
-        passkey = st.text_input("Passkey", type="password", key="login_pass")
-        
-        if st.button("Login", key="login_btn"):
-            handle_login(username, passkey, vault)
-    
-    with tab_register:
-        new_user = st.text_input("New Username", key="reg_user")
-        new_pass = st.text_input("New Passkey", type="password", key="reg_pass")
-        
-        if st.button("Create Account", key="reg_btn"):
-            handle_registration(new_user, new_pass, vault)
+    if is_register:
+        st.markdown("### 📝 Register New User")
+        new_user = st.text_input("Username")
+        new_pass = st.text_input("Passkey", type="password")
 
-def handle_login(username: str, passkey: str, vault: VaultManager) -> None:
-    """Process login attempt."""
-    if not (username and passkey):
-        st.error("Please enter both username and passkey")
-        return
-        
-    user_data = vault.stored_data.get(username)
-    if user_data and vault.hash_passkey(passkey) == user_data["passkey"]:
-        auth.current_user = username
-        auth.reset_attempts()
-        st.success("Login successful!")
-        st.rerun()
+        if st.button("Register"):
+            if new_user and new_pass:
+                if new_user in stored_data:
+                    st.warning("⚠ User exists!")
+                else:
+                    stored_data[new_user] = {"passkey": hash_passkey(new_pass), "encrypted_data": ""}
+                    save_data()
+                    st.success("✅ Registered!")
+            else:
+                st.error("⚠ All fields required.")
+
     else:
-        auth.record_failed_attempt()
-        remaining = MAX_LOGIN_ATTEMPTS - st.session_state.auth["failed_attempts"]
-        st.error(f"Invalid credentials! {remaining} attempts remaining.")
+        st.markdown("### 🔑 User Login")
+        username = st.text_input("Username")
+        passkey = st.text_input("Passkey", type="password")
 
-def handle_registration(username: str, passkey: str, vault: VaultManager) -> None:
-    """Process new user registration."""
-    if not (username and passkey):
-        st.error("All fields are required")
-        return
-        
-    if username in vault.stored_data:
-        st.warning("Username already exists")
-        return
-        
-    vault.stored_data[username] = {
-        "passkey": vault.hash_passkey(passkey),
-        "data": []
-    }
-    vault.save_data()
-    st.success("Account created successfully!")
+        if st.button("Login"):
+            if username in stored_data and hash_passkey(passkey) == stored_data[username]["passkey"]:
+                st.session_state.current_user = username
+                st.session_state.failed_attempts = 0
+                st.success("✅ Login successful!")
+            else:
+                st.session_state.failed_attempts += 1
+                if st.session_state.failed_attempts >= MAX_ATTEMPTS:
+                    st.session_state.lockout_time = time.time()
+                st.error(f"❌ Incorrect passkey! {MAX_ATTEMPTS - st.session_state.failed_attempts} attempts left.")
 
-def show_data_storage(vault: VaultManager) -> None:
-    """Interface for storing encrypted data."""
-    st.subheader("🔐 Store New Data")
-    title = st.text_input("Entry Title")
-    content = st.text_area("Sensitive Data", height=150)
-    
-    if st.button("Encrypt and Save"):
-        if not (title and content):
-            st.error("Both title and content are required")
-            return
-            
-        encrypted = vault.encrypt_data(content)
-        user_data = vault.stored_data[auth.current_user]["data"]
-        
-        # Update existing or add new entry
-        updated = False
-        for entry in user_data:
-            if entry["title"].lower() == title.lower():
-                entry["content"] = encrypted
-                updated = True
-                break
-                
-        if not updated:
-            user_data.append({"title": title, "content": encrypted})
-            
-        vault.save_data()
-        st.success("Data securely stored!")
+# Store Data Page
+elif choice == "Store Data":
+    if not st.session_state.current_user:
+        st.warning("🔐 Please login first.")
+        st.stop()
 
-def show_data_retrieval(vault: VaultManager) -> None:
-    """Interface for retrieving and decrypting data."""
-    if auth.is_locked_out():
-        st.error("Account temporarily locked. Try again later.")
-        return
-        
-    st.subheader("🔍 Retrieve Stored Data")
-    entries = vault.stored_data[auth.current_user]["data"]
-    
-    if not entries:
-        st.info("No stored entries found")
-        return
-        
-    selected = st.selectbox(
-        "Select an entry",
-        options=[e["title"] for e in entries],
-        format_func=lambda x: f"📄 {x}"
-    )
-    
-    passkey = st.text_input("Verify Passkey", type="password")
-    
-    if st.button("Decrypt Data"):
-        user_data = vault.stored_data[auth.current_user]
-        if vault.hash_passkey(passkey) != user_data["passkey"]:
-            auth.record_failed_attempt()
-            remaining = MAX_LOGIN_ATTEMPTS - st.session_state.auth["failed_attempts"]
-            st.error(f"Incorrect passkey! {remaining} attempts remaining.")
-            return
-            
-        auth.reset_attempts()
-        entry = next(e for e in entries if e["title"] == selected)
-        decrypted = vault.decrypt_data(entry["content"])
-        st.success("Decrypted Successfully:")
-        st.code(decrypted, language="text")
+    st.markdown("## 📂 Store Data")
+    title = st.text_input("Title")
+    user_data = st.text_area("Data")
 
-# Main App Interface
-st.title("🔒 VaultLock Secure Storage")
-st.caption("Military-grade encryption for your sensitive data")
+    if st.button("Encrypt & Save"):
+        if title and user_data:
+            encrypted_text = encrypt_data(user_data)
+            entry = {"title": title, "content": encrypted_text}
+            user_entries = stored_data[st.session_state.current_user].get("data", [])
+            for i, item in enumerate(user_entries):
+                if item["title"].lower() == title.lower():
+                    user_entries[i] = entry
+                    break
+            else:
+                user_entries.append(entry)
+            stored_data[st.session_state.current_user]["data"] = user_entries
+            save_data()
+            st.success("✅ Data stored!")
+        else:
+            st.error("⚠ Please enter both title and data.")
 
-if auth.current_user:
-    st.sidebar.success(f"Logged in as: **{auth.current_user}**")
+# Retrieve Data Page
+elif choice == "Retrieve Data":
+    if not st.session_state.current_user:
+        st.warning("🔐 Please login first.")
+        st.stop()
 
-# Navigation
-menu_options = ["Home", "Account"]
-if auth.current_user:
-    menu_options.extend(["Store Data", "Retrieve Data", "Logout"])
-    
-selection = st.sidebar.selectbox("Menu", menu_options)
+    if is_locked_out():
+        st.error("🚫 Too many failed attempts! Try again later.")
+        st.stop()
 
-# Page Routing
-if selection == "Home":
-    st.markdown("""
-        ## Your Secure Data Vault
-        
-        **VaultLock** provides:
-        - 🔐 End-to-end encryption
-        - 🛡️ Zero-knowledge architecture
-        - 📂 Organized data storage
-        - ⏳ Session-based access control
-        
-        Get started by creating an account or logging in.
-    """)
+    st.markdown("## 🔍 Retrieve Data")
+    user = st.session_state.current_user
+    user_entries = stored_data[user].get("data", [])
 
-elif selection == "Account":
-    if auth.current_user:
-        st.success("You are already logged in")
-    else:
-        show_login_form(vault)
+    if not user_entries:
+        st.warning("ℹ No data stored.")
+        st.stop()
 
-elif selection == "Store Data":
-    if not auth.current_user:
-        st.warning("Please log in first")
-    else:
-        show_data_storage(vault)
+    titles = [entry["title"] for entry in user_entries]
+    selected_title = st.selectbox("Choose a Title", titles)
 
-elif selection == "Retrieve Data":
-    if not auth.current_user:
-        st.warning("Please log in first")
-    else:
-        show_data_retrieval(vault)
+    passkey = st.text_input("Enter Passkey Again:", type="password")
 
-elif selection == "Logout":
-    auth.current_user = None
-    st.success("You have been logged out")
-    time.sleep(1)
+    if st.button("Decrypt"):
+        if hash_passkey(passkey) == stored_data[user]["passkey"]:
+            st.session_state.failed_attempts = 0
+            match = next((item for item in user_entries if item["title"] == selected_title), None)
+            if match:
+                decrypted = decrypt_data(match["content"])
+                st.success("✅ Decrypted Data:")
+                st.code(decrypted)
+            else:
+                st.warning("❌ Data not found.")
+        else:
+            st.session_state.failed_attempts += 1
+            if st.session_state.failed_attempts >= MAX_ATTEMPTS:
+                st.session_state.lockout_time = time.time()
+                st.warning("🚫 Too many failed attempts! Try again later.")
+                st.stop()
+            st.error(f"❌ Incorrect passkey! {MAX_ATTEMPTS - st.session_state.failed_attempts} attempts left.")
+
+# Logout
+elif choice == "Logout":
+    st.session_state.current_user = None
+    st.success("👋 Logged out!")
     st.rerun()
