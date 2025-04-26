@@ -60,6 +60,22 @@ The **best part** of MediScan AI Pro is its **end-to-end diagnostic pipeline**, 
 
 ---
 
+
+# MediScan AI Pro
+
+## How OOP’s 4 Fundamentals Work in MediScan AI Pro
+
+A concise overview of how **Encapsulation**, **Abstraction**, **Inheritance**, and **Polymorphism** drive MediScan AI Pro’s modular, secure, and scalable design.
+
+- **Encapsulation**: Bundles data/methods in classes. `UserManager` secures user data (hashed passwords), exposing only `authenticate_user`. `DiagnosisEngine` hides Gemini API logic, offering `analyze_image_with_gemini`. Protects data and simplifies use.
+- **Abstraction**: Hides complexity via high-level interfaces. `MediScanApp` simplifies diagnosis/UI flow, while `ImageProcessor` abstracts image tasks (`save_image`). Enhances user-friendliness for developers/users.
+- **Inheritance**: Implicit in Streamlit’s framework, where `MediScanApp` leverages base classes for UI. Future subclasses (e.g., `BaseProcessor`) could extend `ImageProcessor`. Promotes code reuse, though less prominent.
+- **Polymorphism**: Enables flexible method implementations. `ReportGenerator`’s `export_to_csv`/`export_to_json` vary outputs. `HistoryManager`’s `render_history` customizes UI. Boosts extensibility.
+
+**Impact**: Encapsulation and Abstraction ensure secure, simple interactions with AI diagnosis and authentication. Inheritance and Polymorphism support extensibility. Together, they make the code modular, readable, and scalable, powering features like multilingual UI, reminders, and history tracking.
+
+---
+
 ## Prerequisites
 
 To run or integrate MediScan AI Pro, you need:
