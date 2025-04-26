@@ -1,0 +1,66 @@
+[
+    {
+        "timestamp": "2025-04-26 09:54:17",
+        "file": "a.jpg",
+        "body_part": "Skin",
+        "diagnosis": "Eczema",
+        "treatment": "Moisturizers, avoiding triggers, topical steroids.",
+        "medication": "Hydrocortisone cream, Tacrolimus ointment."
+    },
+    {
+        "timestamp": "2025-04-26 10:47:20",
+        "file": "a.jpg",
+        "body_part": "Skin",
+        "diagnosis": "Psoriasis",
+        "treatment": "Treatment typically involves a combination of topical therapies (creams, ointments), light therapy (phototherapy), and systemic medications (oral or injected).  Specific treatments will depend on the severity of the psoriasis.",
+        "medication": "Medication may include topical corticosteroids, vitamin D analogs, retinoids, or biologics.  Oral medications like methotrexate or cyclosporine may be used in severe cases.  A dermatologist should determine the appropriate medication."
+    },
+    {
+        "timestamp": "2025-04-26 11:00:56",
+        "file": "a.jpg",
+        "body_part": "Skin",
+        "diagnosis": "Psoriasis",
+        "treatment": "Treatment depends on the severity. Options include topical corticosteroids, topical retinoids, Vitamin D analogs, calcineurin inhibitors, phototherapy (light therapy), and systemic medications (like biologics or methotrexate) in more severe cases.  Lifestyle modifications like stress management may also help.",
+        "medication": "Medication will be determined by a dermatologist based on the severity of the condition.  Common options include topical corticosteroids (e.g., clobetasol), Vitamin D analogs (e.g., calcipotriene), and others.  Systemic medications may be required for severe cases."
+    },
+    {
+        "timestamp": "2025-04-26 11:02:31",
+        "file": "f.jpeg",
+        "body_part": "Eye",
+        "diagnosis": "Checkup Needed",
+        "treatment": "A consultation with a dermatologist is recommended for proper diagnosis and treatment.",
+        "medication": "None required until a proper diagnosis is made."
+    },
+    {
+        "timestamp": "2025-04-26 11:02:37",
+        "file": "f.jpeg",
+        "body_part": "Other",
+        "diagnosis": "Checkup Needed",
+        "treatment": "A consultation with a dermatologist or general practitioner is recommended for proper diagnosis and treatment plan.",
+        "medication": "None required until a proper diagnosis is made."
+    },
+    {
+        "timestamp": "2025-04-26 11:16:46",
+        "file": "images.jpg",
+        "body_part": "Eye",
+        "diagnosis": "Healthy",
+        "treatment": "None required",
+        "medication": "None required"
+    },
+    {
+        "timestamp": "2025-04-26 11:45:08",
+        "file": "a.jpg",
+        "body_part": "Skin",
+        "diagnosis": "Psoriasis",
+        "treatment": "Treatment typically involves topical corticosteroids, topical vitamin D analogs, retinoids, or phototherapy (light therapy).  In some cases, systemic medications like biologics or methotrexate may be necessary.",
+        "medication": "Topical corticosteroids (e.g., clobetasol), topical vitamin D analogs (e.g., calcipotriene), or other medications as determined by a dermatologist."
+    },
+    {
+        "timestamp": "2025-04-26 11:57:02",
+        "file": "f.jpeg",
+        "body_part": "Other",
+        "diagnosis": "Rhinophyma",
+        "treatment": "Treatment options include topical retinoids, laser therapy, surgical excision, or a combination of these methods.  The best approach depends on the severity of the condition and individual preferences.",
+        "medication": "Topical retinoids may be prescribed.  Other medications may be used to manage underlying rosacea.  Specific medication should be determined by a dermatologist."
+    }
+]

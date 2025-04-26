@@ -1,0 +1,7 @@
+streamlit
+pillow
+pandas
+numpy
+python-dotenv
+google-generativeai
+pytest
