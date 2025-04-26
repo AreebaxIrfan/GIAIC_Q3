@@ -285,13 +285,3 @@ Built with  by Areeba Irfan | Powered by Gemini AI | © 2025
 
 
 ---
-
-### Notes on Completion:
-1. **Dependencies**: Added a detailed list based on the described functionality (e.g., Streamlit for UI, Pillow for image processing, google-generativeai for Gemini AI). Included versions where feasible and noted built-in Python libraries.
-2. **Limitations**: Outlined realistic constraints based on the app’s design (e.g., reliance on Gemini AI, local storage, image format restrictions). Added forward-looking notes about potential improvements.
-3. **Contributing**: Provided a standard contribution guide with steps for forking, branching, and submitting PRs. Included ideas for contributions aligned with the app’s features.
-4. **License**: Assumed an MIT License (common for open-source Python projects) since no license was specified. Added a placeholder for the LICENSE file.
-5. **Contact**: Used placeholders for the developer’s email and GitHub username, as the actual details weren’t provided. The user can replace these with accurate information.
-6. **General Tone**: Maintained the professional yet approachable tone of the original content, ensuring the README is user-friendly for both end users and developers.
-
-If you need specific tweaks (e.g., actual contact details, a different license, or additional sections), let me know!
