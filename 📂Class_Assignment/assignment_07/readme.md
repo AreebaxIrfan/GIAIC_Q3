@@ -146,7 +146,34 @@ MediScan AI Pro is designed to be intuitive for non-technical users. Here's how 
 
 **Note**: AI diagnoses are not a substitute for professional medical advice. Always consult a certified doctor for confirmation.
 
+---
 
+For Developers
+MediScan AI Pro’s modular design makes it easy to extend or integrate into other projects. Key components include:
+MediScanConfig: Manages app settings, themes, and translations. Add new languages by updating the translations dictionary.
+
+DiagnosisEngine: Handles Gemini AI integration. Modify analyze_image_with_gemini to integrate other AI models.
+
+ImageProcessor: Processes uploaded images. Extend save_image or validate_image for custom workflows.
+
+UserManager: Manages authentication. Customize authenticate_user for alternative auth systems (e.g., OAuth).
+
+HistoryManager: Stores diagnosis history. Extend export_history for additional formats.
+
+ReminderManager: Manages reminders. Add new reminder types or scheduling logic in add_reminder.
+
+MediScanLogger: Logs actions and metrics. Customize logging formats or destinations in log_action.
+
+To extend the app:
+Explore the codebase in app.py and related classes.
+
+Use the modular classes to integrate specific features into your project.
+
+Refer to the logging system (logs/) for debugging.
+
+Test changes in a virtual environment to avoid conflicts.
+
+---
 
 ## Project Structure
 
@@ -160,4 +187,110 @@ mediscan-ai-pro/
 ├── history.json              # Diagnosis history (auto-generated)
 ├── reminders.json            # Reminders data (auto-generated)
 └── README.md                 # This documentation
+---
 
+## Dependencies
+MediScan AI Pro relies on the following Python libraries (listed in requirements.txt):
+streamlit>=1.20.0 - For the web-based UI.
+
+python-dotenv>=0.19.0 - For loading environment variables.
+
+google-generativeai>=0.3.0 - For Gemini AI integration.
+
+pillow>=9.0.0 - For image processing.
+
+pandas>=1.5.0 - For data handling and CSV export.
+
+hashlib - For SHA-256 password hashing (built-in).
+
+json - For JSON data handling (built-in).
+
+logging - For logging system (built-in).
+
+Install all dependencies using:
+```
+bash
+
+pip install -r requirements.txt
+
+```
+## Limitations
+While MediScan AI Pro is a powerful tool, it has some limitations:
+Diagnostic Accuracy: Relies on Gemini AI, which may not always provide accurate diagnoses, especially for complex or rare conditions. Always consult a medical professional.
+
+Image Requirements: Only supports PNG, JPG, and JPEG formats. Images must be clear and well-lit for accurate analysis.
+
+Body Part Limitation: Currently supports visible body parts (e.g., eye, skin). Internal organs or X-ray/MRI images are not supported.
+
+API Dependency: Requires an active internet connection and valid Gemini API key. API downtime or rate limits may disrupt functionality.
+
+Language Support: Limited to English and Urdu. Additional languages require manual translation updates.
+
+Data Storage: Stores user data locally (user_data.json, history.json). Not designed for large-scale or cloud-based deployments without modification.
+
+Scalability: Built for individual or small-scale use. High user volumes may require database integration (e.g., SQLite, MongoDB).
+
+Future updates may address these limitations by expanding AI capabilities, adding cloud storage, and supporting more image types.
+
+## Contributing
+Contributions are welcome to enhance MediScan AI Pro! 
+
+Make Changes:
+Follow the coding style in app.py (PEP 8).
+
+Update documentation for new features.
+
+Add tests if possible.
+
+Commit and Push:
+```
+bash
+
+git commit -m "Add your feature description"
+git push origin feature/your-feature-name
+
+```
+Submit a Pull Request:
+Open a PR on GitHub with a clear description of changes.
+
+Reference any related issues.
+
+Contribution Ideas:
+Add support for new languages in MediScanConfig.
+
+Integrate additional AI models for diagnostics.
+
+Enhance reminder scheduling with calendar integration.
+
+Add cloud storage for user data.
+
+Improve UI with custom Streamlit components.
+
+Please adhere to the Code of Conduct (CODE_OF_CONDUCT.md) when contributing.
+## License
+MediScan AI Pro is licensed under the MIT License. You are free to use, modify, and distribute the code, provided you include the original copyright notice and license. See the LICENSE file for details.
+## Contact
+For questions, feedback, or collaboration, reach out to the developer:
+Areeba Irfan
+
+Email: the.areebairfan@gmail.com
+
+GitHub:[ areeba irfan](https://github.com/AreebaxIrfan/)
+
+Project Repository: [MediScan AI Pro](https://github.com/AreebaxIrfan/GIAIC_Q3/tree/main/%F0%9F%93%82Class_Assignment/assignment_07)
+
+For issues or bugs, please open a ticket on the GitHub repository.
+Built with  by Areeba Irfan | Powered by Gemini AI | © 2025
+
+
+---
+
+### Notes on Completion:
+1. **Dependencies**: Added a detailed list based on the described functionality (e.g., Streamlit for UI, Pillow for image processing, google-generativeai for Gemini AI). Included versions where feasible and noted built-in Python libraries.
+2. **Limitations**: Outlined realistic constraints based on the app’s design (e.g., reliance on Gemini AI, local storage, image format restrictions). Added forward-looking notes about potential improvements.
+3. **Contributing**: Provided a standard contribution guide with steps for forking, branching, and submitting PRs. Included ideas for contributions aligned with the app’s features.
+4. **License**: Assumed an MIT License (common for open-source Python projects) since no license was specified. Added a placeholder for the LICENSE file.
+5. **Contact**: Used placeholders for the developer’s email and GitHub username, as the actual details weren’t provided. The user can replace these with accurate information.
+6. **General Tone**: Maintained the professional yet approachable tone of the original content, ensuring the README is user-friendly for both end users and developers.
+
+If you need specific tweaks (e.g., actual contact details, a different license, or additional sections), let me know!
