@@ -176,7 +176,7 @@ Test changes in a virtual environment to avoid conflicts.
 ---
 
 ## Project Structure
-
+```
 mediscan-ai-pro/
 ├── Uploads/                  # Directory for uploaded images
 ├── logs/                     # Directory for log files
@@ -187,6 +187,7 @@ mediscan-ai-pro/
 ├── history.json              # Diagnosis history (auto-generated)
 ├── reminders.json            # Reminders data (auto-generated)
 └── README.md                 # This documentation
+```
 ---
 
 ## Dependencies
