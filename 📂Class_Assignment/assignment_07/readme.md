@@ -280,6 +280,8 @@ GitHub:[ areeba irfan](https://github.com/AreebaxIrfan/)
 
 Project Repository: [MediScan AI Pro](https://github.com/AreebaxIrfan/GIAIC_Q3/tree/main/%F0%9F%93%82Class_Assignment/assignment_07)
 
+Deployment Link : https://mediscan-ai-pro.streamlit.app/
+
 For issues or bugs, please open a ticket on the GitHub repository.
 Built with  by Areeba Irfan | Powered by Gemini AI | © 2025
 
