@@ -96,7 +96,7 @@ class TestMediScanAIPro:
                 self._buffer = buffer
             
             def getbuffer(self):
-                return self._buffer
+                return self._buffer.getvalue()  # Fixed: Return bytes instead of BytesIO
         
         uploaded_file = UploadedFile('test_eye.jpg', img_buffer)
         file_path = image_processor.save_image(uploaded_file)
