@@ -25,10 +25,10 @@ def get_sensor_data():
         "Humidity (%)": np.random.uniform(50, 70)
     }
 
-def render_home(farm_manager):
-    """Render the home page of the Smart Irrigation App."""
-    st.title("🌾 Smart Irrigation App")
-    st.markdown(f'<div class="header">{get_text("welcome")}</div>', unsafe_allow_html=True)
+# def render_home(farm_manager):
+#     """Render the home page of the Smart Irrigation App."""
+#     st.title("🌾 Smart Irrigation App")
+#     st.markdown(f'<div class="header">{get_text("welcome")}</div>', unsafe_allow_html=True)
 
     # Display urgent alerts
     # alerts = farm_manager.get_recent_alerts()
