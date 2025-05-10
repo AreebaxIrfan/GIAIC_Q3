@@ -1,6 +1,4 @@
 import streamlit as st
-import os
-import logging
 
 # Language dictionary
 TEXT = {
@@ -98,83 +96,11 @@ def get_text(key):
     """Retrieve localized text based on key."""
     return TEXT[st.session_state.get('language', 'en')].get(key, key)
 
-def update_direction():
-    """Update text direction and theme-specific styling based on language."""
-    css = """
-    .main, .stMetric, .card, .urgent-alert, [data-testid="stMarkdownContainer"], [data-testid="stText"] {
-        direction: %s;
-        text-align: %s;
-        color: var(--text-color) !important;
-    }
-    """
-    direction = "rtl" if st.session_state.get('language', 'en') == "ur" else "ltr"
-    alignment = "right" if direction == "rtl" else "left"
-    st.markdown(f"<style>{css % (direction, alignment)}</style>", unsafe_allow_html=True)
+# Example usage (optional, can be removed if not needed)
+if 'language' not in st.session_state:
+    st.session_state.language = 'en'
 
-def load_css():
-    """Load custom CSS from static/styles.css."""
-    css_file = "static/styles.css"
-    try:
-        # Ensure static directory exists
-        os.makedirs("static", exist_ok=True)
-        
-        # Check if CSS file exists
-        if not os.path.exists(css_file):
-            logging.warning(f"CSS file {css_file} not found. Using default styles.")
-            default_css = """
-            @import url('https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu&display=swap');
-            :root {
-                --background-color: #f5f5f5;
-                --text-color: #000000;
-            }
-            @media (prefers-color-scheme: dark) {
-                :root {
-                    --background-color: #1e1e1e;
-                    --text-color: #ffffff;
-                }
-            }
-            .main {
-                background-color: var(--background-color);
-                color: var(--text-color);
-                font-family: 'Noto Nastaliq Urdu', Arial, sans-serif;
-            }
-            .stButton>button {
-                background-color: #4CAF50;
-                color: white;
-                border-radius: 5px;
-            }
-            """
-            with open(css_file, "w") as f:
-                f.write(default_css)
-        
-        # Load CSS
-        with open(css_file) as f:
-            st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
-    except Exception as e:
-        logging.error(f"Failed to load CSS: {str(e)}")
-        # Fallback to inline CSS
-        fallback_css = """
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu&display=swap');
-        :root {
-            --background-color: #f5f5f5;
-            --text-color: #000000;
-        }
-        @media (prefers-color-scheme: dark) {
-            :root {
-                --background-color: #1e1e1e;
-                --text-color: #ffffff;
-            }
-        }
-        .main {
-            background-color: var(--background-color);
-            color: var(--text-color);
-            font-family: 'Noto Nastaliq Urdu', Arial, sans-serif;
-        }
-        .stButton>button {
-            background-color: #4CAF50;
-            color: white;
-            border-radius: 5px;
-        }
-        """
-        st.markdown(f"<style>{fallback_css}</style>", unsafe_allow_html=True)
-        st.warning("Failed to load custom styles. Using fallback styles.")
+st.selectbox("Select Language", ["English", "Urdu"], key="language_selector", 
+             on_change=lambda: st.session_state.update(language="ur" if st.session_state.language_selector == "Urdu" else "en"))
+
+st.write(get_text("welcome"))
