@@ -135,6 +135,21 @@ def load_css():
             st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
     except Exception as e:
         logging.error(f"Failed to load CSS: {str(e)}")
+         # Fallback to inline CSS
+        fallback_css = """
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu&display=swap');
+         .main {
+            background-color: #f5f5f5;
+            text-color: black;
+            font-family: 'Noto Nastaliq Urdu', sans-serif;
+        }
+        .stButton>button {
+            background-color: #4CAF50;
+            color: white;
+            border-radius: 5px;
+        }
+       
+        """
        
         st.markdown(f"<style>{fallback_css}</style>", unsafe_allow_html=True)
         st.warning("Failed to load custom styles. Using fallback styles.")
