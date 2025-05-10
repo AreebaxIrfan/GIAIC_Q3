@@ -92,6 +92,7 @@ TEXT = {
     }
 }
 
+
 def get_text(key):
     return TEXT[st.session_state.language].get(key, key)
 
