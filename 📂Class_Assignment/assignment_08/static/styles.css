@@ -1,4 +1,6 @@
+/* Default Light Theme (already defined) */
 @import url('https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu&display=swap');
+
 .main {
     background-color: #f5f5f5;
     font-family: 'Noto Nastaliq Urdu', sans-serif;
@@ -43,4 +45,36 @@
 .ltr {
     direction: ltr;
     text-align: left;
+}
+
+/* Dark Mode Adjustments */
+@media (prefers-color-scheme: dark) {
+    .main {
+        background-color: #1a1a1a; /* Dark background */
+        color: #e0e0e0; /* Light text for readability */
+    }
+    .stButton>button {
+        background-color: #388E3C; /* Darker green for buttons */
+        color: #e0e0e0;
+    }
+    .stMetric {
+        background-color: #2a2a2a; /* Darker card background */
+        color: #e0e0e0;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.3); /* Subtle shadow for depth */
+    }
+    .card {
+        background-color: #2a2a2a; /* Darker card background */
+        color: #e0e0e0;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+    .header {
+        color: #66BB6A; /* Lighter green for headers */
+    }
+    .subheader {
+        color: #42A5F5; /* Lighter blue for subheaders */
+    }
+    .urgent-alert {
+        background-color: #D32F2F; /* Slightly darker red for alerts */
+        color: #ffffff;
+    }
 }
