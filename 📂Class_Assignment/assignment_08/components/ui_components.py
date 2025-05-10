@@ -101,7 +101,11 @@ def update_direction():
         st.markdown('<style>.main, .stMetric, .card, .urgent-alert {direction: rtl; text-align: right;}</style>', unsafe_allow_html=True)
     else:
         st.markdown('<style>.main, .stMetric, .card, .urgent-alert {direction: ltr; text-align: left;}</style>', unsafe_allow_html=True)
-
 def load_css():
-    with open("static/styles.css") as f:
-        st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
+    # Use absolute path to static/styles.css
+    css_path = os.path.join(os.path.dirname(__file__), '..', 'static', 'styles.css')
+    try:
+        with open(css_path) as f:
+            st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
+    except FileNotFoundError:
+        st.warning("Warning: static/styles.css not found. Using default styling.")
