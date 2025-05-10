@@ -101,7 +101,11 @@ def get_text(key):
 def update_direction():
     """Update text direction and theme-specific styling based on language."""
     css = """
-   
+    .main, .stMetric, .card, .urgent-alert, [data-testid="stMarkdownContainer"], [data-testid="stText"] {
+        direction: %s;
+        text-align: %s;
+        color: var(--text-color) !important;
+    }
     """
     direction = "rtl" if st.session_state.get('language', 'en') == "ur" else "ltr"
     alignment = "right" if direction == "rtl" else "left"
@@ -119,7 +123,26 @@ def load_css():
             logging.warning(f"CSS file {css_file} not found. Using default styles.")
             default_css = """
             @import url('https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu&display=swap');
-            
+            :root {
+                --background-color: #f5f5f5;
+                --text-color: #000000;
+            }
+            @media (prefers-color-scheme: dark) {
+                :root {
+                    --background-color: #1e1e1e;
+                    --text-color: #ffffff;
+                }
+            }
+            .main {
+                background-color: var(--background-color);
+                color: var(--text-color);
+                font-family: 'Noto Nastaliq Urdu', Arial, sans-serif;
+            }
+            .stButton>button {
+                background-color: #4CAF50;
+                color: white;
+                border-radius: 5px;
+            }
             """
             with open(css_file, "w") as f:
                 f.write(default_css)
@@ -131,7 +154,27 @@ def load_css():
         logging.error(f"Failed to load CSS: {str(e)}")
         # Fallback to inline CSS
         fallback_css = """
-       
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu&display=swap');
+        :root {
+            --background-color: #f5f5f5;
+            --text-color: #000000;
+        }
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --background-color: #1e1e1e;
+                --text-color: #ffffff;
+            }
+        }
+        .main {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            font-family: 'Noto Nastaliq Urdu', Arial, sans-serif;
+        }
+        .stButton>button {
+            background-color: #4CAF50;
+            color: white;
+            border-radius: 5px;
+        }
         """
         st.markdown(f"<style>{fallback_css}</style>", unsafe_allow_html=True)
         st.warning("Failed to load custom styles. Using fallback styles.")
