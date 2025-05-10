@@ -5,8 +5,6 @@ from datetime import datetime
 import plotly.express as px
 import logging
 from utils.api_utils import get_weather_data, get_soil_data, send_sms_alert
-from utils.db_utils import log_action
-from utils.ml_utils import predict_disease
 from components.ui_components import get_text
 
 # Define a safe rerun function for compatibility
@@ -30,7 +28,7 @@ def render_home(farm_manager):
     st.title("🌾 Smart Irrigation App")
     st.markdown(f'<div class="header">{get_text("welcome")}</div>', unsafe_allow_html=True)
 
-    Display urgent alerts
+    # Display urgent alerts
     alerts = farm_manager.get_recent_alerts()
     if not alerts.empty and "Action" in alerts.columns:
         urgent_alerts = alerts[alerts["Action"] == "Urgent Alert"]
