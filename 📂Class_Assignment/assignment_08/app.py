@@ -3,7 +3,6 @@ from components.ui_components import TEXT, get_text, update_direction, load_css
 from components.dashboard import render_home, render_dashboard
 from components.crop_calendar import render_crop_calendar
 from components.live_mandi import render_live_mandi
-from components.reports import render_reports
 from components.cost_calculator import render_cost_calculator
 from components.add_ons import render_add_ons
 from components.consulted import render_consulted
