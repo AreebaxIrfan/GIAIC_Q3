@@ -3,7 +3,7 @@
 /* Define CSS variables for light and dark themes */
 :root {
     --background-color: #f5f5f5;
-    --text-color: #333333;
+    --text-color: #1a1a1a; /* Darker for better contrast in light theme */
     --card-background: #ffffff;
     --card-shadow: 0 2px 4px rgba(0,0,0,0.1);
     --button-background: #4CAF50;
@@ -17,7 +17,7 @@
 @media (prefers-color-scheme: dark) {
     :root {
         --background-color: #1e1e1e;
-        --text-color: #e0e0e0;
+        --text-color: #ffffff; /* Pure white for max contrast in dark theme */
         --card-background: #2a2a2a;
         --card-shadow: 0 2px 4px rgba(0,0,0,0.3);
         --button-background: #4CAF50;
@@ -36,10 +36,24 @@
     font-family: 'Noto Nastaliq Urdu', sans-serif;
 }
 
+/* Ensure text color for all elements */
+.main * {
+    color: var(--text-color) !important;
+}
+
+/* Specific elements */
+h1, h2, h3, h4, h5, h6 {
+    color: var(--header-color) !important;
+}
+
+p, div, span, label {
+    color: var(--text-color) !important;
+}
+
 /* Buttons */
 .stButton>button {
     background-color: var(--button-background);
-    color: white;
+    color: white !important;
     border-radius: 5px;
     border: none;
     padding: 10px 20px;
@@ -56,7 +70,11 @@
     border-radius: 10px;
     padding: 10px;
     box-shadow: var(--card-shadow);
-    color: var(--text-color);
+    color: var(--text-color) !important;
+}
+
+.stMetric label, .stMetric div {
+    color: var(--text-color) !important;
 }
 
 /* Cards */
@@ -66,26 +84,26 @@
     padding: 15px;
     margin: 10px 0;
     box-shadow: var(--card-shadow);
-    color: var(--text-color);
+    color: var(--text-color) !important;
 }
 
 /* Headers */
 .header {
-    color: var(--header-color);
+    color: var(--header-color) !important;
     font-size: 24px;
     font-weight: bold;
 }
 
 /* Subheaders */
 .subheader {
-    color: var(--subheader-color);
+    color: var(--subheader-color) !important;
     font-size: 18px;
 }
 
 /* Urgent alerts */
 .urgent-alert {
     background-color: var(--alert-background);
-    color: white;
+    color: white !important;
     padding: 10px;
     border-radius: 5px;
 }
@@ -104,15 +122,25 @@
 /* Sidebar styling */
 .stSidebar .sidebar-content {
     background-color: var(--card-background);
-    color: var(--text-color);
+    color: var(--text-color) !important;
 }
 
-/* Ensure text inputs and other elements adapt */
+.stSidebar .sidebar-content * {
+    color: var(--text-color) !important;
+}
+
+/* Text inputs and select boxes */
 .stTextInput>div>input,
 .stSelectbox>div>select {
     background-color: var(--card-background);
-    color: var(--text-color);
+    color: var(--text-color) !important;
     border: 1px solid var(--text-color);
     border-radius: 5px;
     padding: 8px;
+}
+
+/* Ensure Streamlit markdown and write text is visible */
+[data-testid="stMarkdownContainer"],
+[data-testid="stText"] {
+    color: var(--text-color) !important;
 }
