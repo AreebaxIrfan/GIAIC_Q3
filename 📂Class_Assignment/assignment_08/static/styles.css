@@ -1,0 +1,45 @@
+.main {
+    background-color: #f5f5f5;
+    font-family: 'Noto Nastaliq Urdu', sans-serif;
+}
+.stButton>button {
+    background-color: #4CAF50;
+    color: white;
+    border-radius: 5px;
+}
+.stMetric {
+    background-color: #ffffff;
+    border-radius: 10px;
+    padding: 10px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+.card {
+    background-color: #ffffff;
+    border-radius: 10px;
+    padding: 15px;
+    margin: 10px 0;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+.header {
+    color: #4CAF50;
+    font-size: 24px;
+    font-weight: bold;
+}
+.subheader {
+    color: #2196F3;
+    font-size: 18px;
+}
+.urgent-alert {
+    background-color: #FF4C4C;
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+}
+.rtl {
+    direction: rtl;
+    text-align: right;
+}
+.ltr {
+    direction: ltr;
+    text-align: left;
+}
