@@ -105,3 +105,48 @@ def update_direction():
     else:
         st.markdown('<style>.main, .stMetric, .card, .urgent-alert {direction: ltr; text-align: left;}</style>', unsafe_allow_html=True)
 
+def load_css():
+    """Load custom CSS from static/styles.css."""
+    css_file = "static/styles.css"
+    try:
+        # Ensure static directory exists
+        os.makedirs("static", exist_ok=True)
+        
+        # Check if CSS file exists
+        if not os.path.exists(css_file):
+            logging.warning(f"CSS file {css_file} not found. Using default styles.")
+            default_css = """
+            @import url('https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu&display=swap');
+            .main {
+                background-color: #f5f5f5;
+                font-family: 'Noto Nastaliq Urdu', sans-serif;
+            }
+            .stButton>button {
+                background-color: #4CAF50;
+                color: white;
+                border-radius: 5px;
+            }
+            """
+            with open(css_file, "w") as f:
+                f.write(default_css)
+        
+        # Load CSS
+        with open(css_file) as f:
+            st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+    except Exception as e:
+        logging.error(f"Failed to load CSS: {str(e)}")
+        # Fallback to inline CSS
+        fallback_css = """
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu&display=swap');
+        .main {
+            background-color: #f5f5f5;
+            font-family: 'Noto Nastaliq Urdu', sans-serif;
+        }
+        .stButton>button {
+            background-color: #4CAF50;
+            color: white;
+            border-radius: 5px;
+        }
+        """
+        st.markdown(f"<style>{fallback_css}</style>", unsafe_allow_html=True)
+        st.warning("Failed to load custom styles. Using fallback styles.")
