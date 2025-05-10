@@ -31,15 +31,15 @@ def render_home(farm_manager):
     st.markdown(f'<div class="header">{get_text("welcome")}</div>', unsafe_allow_html=True)
 
     # Display urgent alerts
-    alerts = farm_manager.get_recent_alerts()
-    if not alerts.empty and "Action" in alerts.columns:
-        urgent_alerts = alerts[alerts["Action"] == "Urgent Alert"]
-        if not urgent_alerts.empty:
-            st.markdown('<div class="urgent-alert">', unsafe_allow_html=True)
-            st.markdown(f"**{get_text('urgent_alert')}:** {urgent_alerts['Details'].iloc[-1]}")
-            st.markdown('</div>', unsafe_allow_html=True)
-    else:
-        st.write(get_text("no_alerts"))
+    # alerts = farm_manager.get_recent_alerts()
+    # if not alerts.empty and "Action" in alerts.columns:
+    #     urgent_alerts = alerts[alerts["Action"] == "Urgent Alert"]
+    #     if not urgent_alerts.empty:
+    #         st.markdown('<div class="urgent-alert">', unsafe_allow_html=True)
+    #         st.markdown(f"**{get_text('urgent_alert')}:** {urgent_alerts['Details'].iloc[-1]}")
+    #         st.markdown('</div>', unsafe_allow_html=True)
+    # else:
+    #     st.write(get_text("no_alerts"))
 
     # Welcome section
     st.markdown(
