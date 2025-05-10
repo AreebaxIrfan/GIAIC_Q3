@@ -140,6 +140,7 @@ def load_css():
         @import url('https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu&display=swap');
         .main {
             background-color: #f5f5f5;
+            text-color: black;
             font-family: 'Noto Nastaliq Urdu', sans-serif;
         }
         .stButton>button {
