@@ -93,14 +93,14 @@ TEXT = {
 }
 
 def get_text(key):
-    """Retrieve localized text based on key."""
-    return TEXT[st.session_state.get('language', 'en')].get(key, key)
+    return TEXT[st.session_state.language].get(key, key)
 
-# Example usage (optional, can be removed if not needed)
-if 'language' not in st.session_state:
-    st.session_state.language = 'en'
+def update_direction():
+    if st.session_state.language == "ur":
+        st.markdown('<style>.main, .stMetric, .card, .urgent-alert {direction: rtl; text-align: right;}</style>', unsafe_allow_html=True)
+    else:
+        st.markdown('<style>.main, .stMetric, .card, .urgent-alert {direction: ltr; text-align: left;}</style>', unsafe_allow_html=True)
 
-st.selectbox("Select Language", ["English", "Urdu"], key="language_selector", 
-             on_change=lambda: st.session_state.update(language="ur" if st.session_state.language_selector == "Urdu" else "en"))
-
-st.write(get_text("welcome"))
+def load_css():
+    with open("static/styles.css") as f:
+        st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
