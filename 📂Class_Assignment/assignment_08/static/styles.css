@@ -1,80 +1,118 @@
-/* Default Light Theme (already defined) */
 @import url('https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu&display=swap');
 
+/* Define CSS variables for light and dark themes */
+:root {
+    --background-color: #f5f5f5;
+    --text-color: #333333;
+    --card-background: #ffffff;
+    --card-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    --button-background: #4CAF50;
+    --button-hover: #45a049;
+    --header-color: #4CAF50;
+    --subheader-color: #2196F3;
+    --alert-background: #FF4C4C;
+    --metric-background: #ffffff;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --background-color: #1e1e1e;
+        --text-color: #e0e0e0;
+        --card-background: #2a2a2a;
+        --card-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        --button-background: #4CAF50;
+        --button-hover: #45a049;
+        --header-color: #81C784;
+        --subheader-color: #64B5F6;
+        --alert-background: #D32F2F;
+        --metric-background: #2a2a2a;
+    }
+}
+
+/* Main content */
 .main {
-    background-color: #f5f5f5;
+    background-color: var(--background-color);
+    color: var(--text-color);
     font-family: 'Noto Nastaliq Urdu', sans-serif;
 }
+
+/* Buttons */
 .stButton>button {
-    background-color: #4CAF50;
+    background-color: var(--button-background);
     color: white;
     border-radius: 5px;
+    border: none;
+    padding: 10px 20px;
+    transition: background-color 0.2s;
 }
+
+.stButton>button:hover {
+    background-color: var(--button-hover);
+}
+
+/* Metrics */
 .stMetric {
-    background-color: #ffffff;
+    background-color: var(--metric-background);
     border-radius: 10px;
     padding: 10px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    box-shadow: var(--card-shadow);
+    color: var(--text-color);
 }
+
+/* Cards */
 .card {
-    background-color: #ffffff;
+    background-color: var(--card-background);
     border-radius: 10px;
     padding: 15px;
     margin: 10px 0;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    box-shadow: var(--card-shadow);
+    color: var(--text-color);
 }
+
+/* Headers */
 .header {
-    color: #4CAF50;
+    color: var(--header-color);
     font-size: 24px;
     font-weight: bold;
 }
+
+/* Subheaders */
 .subheader {
-    color: #2196F3;
+    color: var(--subheader-color);
     font-size: 18px;
 }
+
+/* Urgent alerts */
 .urgent-alert {
-    background-color: #FF4C4C;
+    background-color: var(--alert-background);
     color: white;
     padding: 10px;
     border-radius: 5px;
 }
+
+/* Text direction */
 .rtl {
     direction: rtl;
     text-align: right;
 }
+
 .ltr {
     direction: ltr;
     text-align: left;
 }
 
-/* Dark Mode Adjustments */
-@media (prefers-color-scheme: dark) {
-    .main {
-        background-color: #1a1a1a; /* Dark background */
-        color: #e0e0e0; /* Light text for readability */
-    }
-    .stButton>button {
-        background-color: #388E3C; /* Darker green for buttons */
-        color: #e0e0e0;
-    }
-    .stMetric {
-        background-color: #2a2a2a; /* Darker card background */
-        color: #e0e0e0;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.3); /* Subtle shadow for depth */
-    }
-    .card {
-        background-color: #2a2a2a; /* Darker card background */
-        color: #e0e0e0;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-    }
-    .header {
-        color: #66BB6A; /* Lighter green for headers */
-    }
-    .subheader {
-        color: #42A5F5; /* Lighter blue for subheaders */
-    }
-    .urgent-alert {
-        background-color: #D32F2F; /* Slightly darker red for alerts */
-        color: #ffffff;
-    }
+/* Sidebar styling */
+.stSidebar .sidebar-content {
+    background-color: var(--card-background);
+    color: var(--text-color);
+}
+
+/* Ensure text inputs and other elements adapt */
+.stTextInput>div>input,
+.stSelectbox>div>select {
+    background-color: var(--card-background);
+    color: var(--text-color);
+    border: 1px solid var(--text-color);
+    border-radius: 5px;
+    padding: 8px;
 }
