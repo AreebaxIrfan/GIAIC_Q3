@@ -6,17 +6,30 @@ from components.live_mandi import render_live_mandi
 from components.cost_calculator import render_cost_calculator
 from components.add_ons import render_add_ons
 from components.consulted import render_consulted
-from components.weather_defense import FarmManager, Crop
+from components.weather_defense import FarmManager, Crop, render_weather_defense
 from components.crop_health import render_crop_health
 import numpy as np
 import logging
+import os
+import sys
 
-# Configure logging
-logging.basicConfig(
-    filename="logs/app.log",
-    level=logging.DEBUG,
-    format="%(asctime)s - %(levelname)s: %(message)s"
-)
+# Ensure the logs directory exists
+log_dir = "logs"
+try:
+    if not os.path.exists(log_dir):
+        os.makedirs(log_dir)
+    logging.basicConfig(
+        filename=os.path.join(log_dir, "app.log"),
+        level=logging.DEBUG,
+        format="%(asctime)s - %(levelname)s: %(message)s"
+    )
+except (PermissionError, OSError) as e:
+    logging.basicConfig(
+        stream=sys.stderr,
+        level=logging.DEBUG,
+        format="%(asctime)s - %(levelname)s: %(message)s"
+    )
+    print(f"Error setting up file logging: {e}. Logging to stderr instead.")
 
 class LanguageManager:
     """Manages language selection and text direction."""
@@ -54,7 +67,7 @@ class CustomCrop(Crop):
         self.tasks = tasks
         self.seasonal_suitability = seasonal_suitability
         self.health_thresholds = health_thresholds
-        self.weather_sensitivity = weather_sensitivity \
+        self.weather_sensitivity = weather_sensitivity
 
     def __str__(self):
         """Ensure string representation returns the crop name."""
@@ -199,7 +212,7 @@ class DashboardApp:
             elif page == self.language_manager.get_text("crop_health"):
                 render_crop_health(self.farm_manager, self.crops)
             elif page == self.language_manager.get_text("weather_defense"):
-                render_weather_defense(self.farm_manager, self.crops)  # Added crops parameter
+                render_weather_defense(self.farm_manager, self.crops)
         except Exception as e:
             self.logger.error("Failed to route page %s: %s", page, str(e))
             st.error("Error rendering page. Please check logs/app.log.")

@@ -6,16 +6,10 @@ import os
 from datetime import datetime, timedelta
 import numpy as np
 from dotenv import load_dotenv
+import plotly.express as px
 
 # Load environment variables
 load_dotenv()
-
-# Set up logging
-logging.basicConfig(
-    filename="logs/app.log",
-    level=logging.DEBUG,
-    format="%(asctime)s - %(levelname)s: %(message)s"
-)
 
 class Crop:
     """Represents a basic crop entity."""
@@ -82,7 +76,7 @@ class FarmManager:
     """Manages farm operations including crops, alerts, health, and market data."""
     def __init__(self, crops=None):
         self.crops = []  # List of Crop objects
-        self.custom_crops = crops or []  # List of CustomCrop objects from app.py
+        self.custom_crops = crops or []  # List of CustomCrop objects
         self.logger = logging.getLogger(__name__)
         self.alerts = pd.DataFrame(columns=["message", "severity", "timestamp", "Action"]).astype({
             "message": "object",
@@ -123,22 +117,19 @@ class FarmManager:
                 raise ValueError(f"Crop {crop_name} not found")
 
             sowing_dt = datetime.strptime(sowing_date, "%Y-%m-%d")
-            # Estimate harvesting date based on crop's harvesting months
             harvest_month = crop_obj.harvesting_months[0]
             harvest_year = sowing_dt.year + 1 if harvest_month < sowing_dt.month else sowing_dt.year
             harvesting_date = datetime(harvest_year, harvest_month, 15).strftime("%Y-%m-%d")
 
-            # Generate tasks schedule
             tasks = []
             current_date = sowing_dt
             task_list = list(crop_obj.tasks.keys())
-            days_between_tasks = 30  # Spread tasks over the growing period
+            days_between_tasks = 30
             for i, task in enumerate(task_list):
                 task_date = (current_date + timedelta(days=i * days_between_tasks)).strftime("%Y-%m-%d")
                 if datetime.strptime(task_date, "%Y-%m-%d") <= datetime.strptime(harvesting_date, "%Y-%m-%d"):
                     tasks.append({"task": task, "date": task_date})
 
-            # Get weather forecast for notes
             weather_forecast = self._get_weather_forecast(city)
             if not weather_forecast:
                 weather_forecast = [
@@ -146,14 +137,12 @@ class FarmManager:
                     for i in range(90)
                 ]
 
-            # Add weather-based notes to tasks
             for task in tasks:
                 task_date = task["date"]
                 weather = next((w for w in weather_forecast if w["date"] == task_date), {"temp": 25, "rainfall": 0})
                 task["notes"] = (
                     "Delay task if heavy rain" if weather["rainfall"] > 10 else
-                    "Provide shade if hot" if weather["temp"] > 30 else
-                    ""
+                    "Provide shade if hot" if weather["temp"] > 30 else ""
                 )
 
             schedule = {
@@ -175,7 +164,6 @@ class FarmManager:
                 self.logger.error(f"Crop {crop_name} not found")
                 return pd.DataFrame(columns=["crop_name", "task_name", "task_date"])
 
-            # Simulate calendar data based on crop tasks and sowing/harvesting months
             sowing_month = crop_obj.sowing_months[0]
             harvest_month = crop_obj.harvesting_months[0]
             current_year = datetime.now().year
@@ -215,10 +203,10 @@ class FarmManager:
                     0.5
                 )
                 if month in crop.sowing_months:
-                    suitability += 0.2  # Boost suitability for sowing months
+                    suitability += 0.2
                 recommendations.append({
                     "crop": crop.name,
-                    "suitability": suitability * 100  # Convert to percentage
+                    "suitability": suitability * 100
                 })
             recommendations = sorted(recommendations, key=lambda x: x["suitability"], reverse=True)
             self.logger.info(f"Generated recommendations for {city}, month {month}")
@@ -236,7 +224,6 @@ class FarmManager:
             self.logger.error(f"Failed to fetch weather forecast for {city}: {str(e)}")
             return []
 
-    # Other methods (add_alert, monitor_crop_health, etc.) are unchanged from previous responses
     def add_alert(self, message, severity, timestamp=None, action="Review recommendations"):
         """Add an alert to the alerts DataFrame."""
         try:
@@ -394,18 +381,19 @@ class FarmManager:
                 "temp": np.random.uniform(20, 30),
                 "humidity": np.random.uniform(50, 70)
             }
-            health_data = self.monitor_crop_health(crop_name, sensor_data, get_weather_data(city) or {
-                "temp": 25,
-                "rain_chance": 0
-            })
-            health_score = health_data["health_score"]
-            action = health_data["action"]
-
-            weather_data = get_weather_data(city) or {
+            weather_client = WeatherAPIClient(os.getenv("OPENWEATHER_API_KEY"))
+            weather_forecast = weather_client.fetch_forecast(city)
+            weather_data = weather_forecast[0] if weather_forecast else {
                 "temp": 25,
                 "rain_chance": 0,
                 "description": "Clear"
             }
+            weather_data["rain_chance"] = weather_data.get("rainfall", 0) * 10
+
+            health_data = self.monitor_crop_health(crop_name, sensor_data, weather_data)
+            health_score = health_data["health_score"]
+            action = health_data["action"]
+
             weather_risk = "High" if weather_data["rain_chance"] > 50 or weather_data["temp"] > 35 else "Low"
             risk_action = crop_obj.weather_sensitivity.get(
                 "heavy_rain" if weather_risk == "High" and weather_data["rain_chance"] > 50 else "heatwave",
@@ -468,5 +456,62 @@ class FarmManager:
                 "price_per_kg": "float64"
             })
 
-# Note: Include GeminiAnalyzer, WeatherDefenseUI, and render_weather_defense from previous response
-# For brevity, they are omitted here but should be part of the full weather_defense.py
+def render_weather_defense(farm_manager, crops):
+    """Render the Weather Defense page in Streamlit."""
+    st.title("Weather Defense")
+    st.write("Monitor weather forecasts and crop health to protect your farm.")
+
+    try:
+        # Ensure farm_manager has the latest crops
+        farm_manager.custom_crops = crops
+        for crop in crops:
+            if crop.name not in [c.name for c in farm_manager.crops]:
+                farm_manager.add_crop(crop.name)
+
+        # User inputs
+        crop_names = [crop.name for crop in crops]
+        selected_crop = st.selectbox("Select Crop", crop_names)
+        city = st.text_input("City", "Karachi")
+
+        if st.button("Get Weather and Health Data"):
+            with st.spinner("Fetching data..."):
+                # Fetch weather forecast
+                weather_client = WeatherAPIClient(os.getenv("OPENWEATHER_API_KEY"))
+                forecast = weather_client.fetch_forecast(city)
+                
+                # Get crop summary
+                summary = farm_manager.get_summary(selected_crop, city)
+
+                # Display weather forecast
+                st.subheader("5-Day Weather Forecast")
+                if forecast:
+                    forecast_df = pd.DataFrame(forecast)
+                    st.dataframe(forecast_df[["date", "temp", "rainfall", "risk_level"]])
+                    fig = px.line(forecast_df, x="date", y="temp", title=f"Temperature Forecast for {city}")
+                    st.plotly_chart(fig)
+                else:
+                    st.warning("No weather data available.")
+
+                # Display crop health summary
+                st.subheader("Crop Health Summary")
+                if summary["health_score"] is not None:
+                    st.write(f"Health Score: {summary['health_score']}%")
+                    st.write(f"Weather Risk: {summary['weather_risk']}")
+                    st.write(f"Action: {summary['action'] or 'None'}")
+                    st.write(f"Risk Action: {summary['risk_action'] or 'None'}")
+                    st.write(f"Next Task: {summary['next_task'] or 'None'}")
+                    st.write(f"Mandi Price: ₹{summary['mandi_price']:.2f}/kg" if summary['mandi_price'] else "Price not available")
+                else:
+                    st.error("Unable to retrieve crop health data.")
+
+                # Display recent alerts
+                st.subheader("Recent Alerts")
+                alerts = farm_manager.get_recent_alerts()
+                if not alerts.empty:
+                    st.dataframe(alerts[["timestamp", "message", "severity", "Action"]])
+                else:
+                    st.info("No alerts available.")
+
+    except Exception as e:
+        logging.error(f"Weather Defense failed: {str(e)}")
+        st.error("An error occurred. Please check the logs for details.")
