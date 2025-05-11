@@ -6,7 +6,6 @@
 [![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://agrigrow.streamlit.app/) 
 [![OpenWeatherMap](https://img.shields.io/badge/Powered%20by-OpenWeatherMap-%23007bbb)](https://openweathermap.org/)
 
-![Dashboard Preview](https://via.placeholder.com/800x400.png?text=Smart+AgriPak+Dashboard+Preview) *Replace with actual screenshot*
 
 ## 🌟 Key Features
 
