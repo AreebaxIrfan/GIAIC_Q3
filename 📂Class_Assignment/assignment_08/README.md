@@ -64,9 +64,9 @@ SmartAgriPakDashboard/
 │   │   ├── ui_components.py      # UI elements
 │   │   └── weather_defense.py    # Weather forecasting
 │   ├── data/                     # Data storage
-│   │   └── database/             # Database files
+│   │   └── database/             # files
 │   ├── logs/                     # Application logs
-│   ├── models/                   # Machine learning models
+│   ├── models/                   # models
 │   ├── static/                   # Static assets (CSS, images)
 │   ├── utils/                    # Utility functions
 │   ├── app.py                    # Main application launcher
