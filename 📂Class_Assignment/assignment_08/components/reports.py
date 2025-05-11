@@ -50,7 +50,7 @@ def generate_pdf_report(df, filename="data/history_report.pdf"):
         pdf.add_page()
 
         # Title
-        title = "Smart Irrigation App Report" if st.session_state.get("language", "en") == "en" else "سمارٹ ایریگیشن ایپ رپورٹ"
+        title = "Smart AgriPak App Report" if st.session_state.get("language", "en") == "en" else "سمارٹ  پاک ایپ رپورٹ"
         pdf.set_font("NotoSans", "B", 16)
         pdf.cell(0, 10, title, ln=True, align="C")
         pdf.ln(10)

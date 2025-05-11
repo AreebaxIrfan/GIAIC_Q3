@@ -92,7 +92,7 @@ class LoginUI:
             st.error(self.language_config.get_text("error_login"))
 
 def render_login():
-    """Renders the login page for the Smart Irrigation Dashboard."""
+    """Renders the login page for the Smart AgriPak Dashboard."""
     language = st.session_state.get("language", "en")
     language_config = LanguageConfig(language)
     auth_manager = AuthenticationManager()

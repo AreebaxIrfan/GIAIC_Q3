@@ -87,7 +87,7 @@ class PestScannerUI:
         st.error(self.language_config.get_text("error_scanner"))
 
 def render_add_ons():
-    """Renders the add-ons page for the Smart Irrigation Dashboard."""
+    """Renders the add-ons page for the Smart AgriPak Dashboard."""
     language = st.session_state.get("language", "en")
     language_config = LanguageConfig(language)
     pest_scanner = PestScanner()

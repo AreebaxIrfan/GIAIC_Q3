@@ -123,12 +123,12 @@ class CropFactory:
         ]
 
 class DashboardApp:
-    """Main application class for the Smart Irrigation Dashboard."""
+    """Main application class for the Smart AgriPak Dashboard."""
     def __init__(self):
         self.logger = logging.getLogger(__name__)
         try:
             # Set page configuration
-            st.set_page_config(page_title="Smart Irrigation Dashboard", layout="wide")
+            st.set_page_config(page_title="Smart AgriPak Dashboard", layout="wide")
 
             # Initialize session state
             if "logged_in" not in st.session_state:

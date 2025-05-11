@@ -112,7 +112,7 @@ class ConsultedUI:
         st.error(self.language_config.get_text("error_chatbot"))
 
 def render_consulted():
-    """Renders the consulted page for the Smart Irrigation Dashboard."""
+    """Renders the consulted page for the Smart AgriPak Dashboard."""
     language = st.session_state.get("language", "en")
     language_config = LanguageConfig(language)
     chatbot = Chatbot()

@@ -176,7 +176,7 @@ class RegistrationUI:
             st.error(self.language_config.get_text("error_registration"))
 
 def render_registration():
-    """Renders the registration page for the Smart Irrigation Dashboard."""
+    """Renders the registration page for the Smart AgriPak Dashboard."""
     language = st.session_state.get("language", "en")
     language_config = LanguageConfig(language)
     user_repository = UserRepository()

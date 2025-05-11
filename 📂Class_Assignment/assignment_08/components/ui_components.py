@@ -5,7 +5,7 @@ import os
 # Language dictionary
 TEXT = {
     "en": {
-        "welcome": "Welcome to Your Smart Farm!",
+        "welcome": "Welcome to Your Smart AgriPak Farm!",
         "farm_name": "Enter your farm name",
         "select_crop": "Select Crop",
         "city": "Enter City",

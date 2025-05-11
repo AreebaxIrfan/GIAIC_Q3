@@ -1,6 +1,6 @@
-# Smart Irrigation Dashboard
+# Smart AgriPak Dashboard
 
-The **Smart Irrigation Dashboard** is a web-based application built with [Streamlit](https://agrigrow.streamlit.app/) to support farmers in managing their agricultural operations. Designed as part of a class assignment (likely for the **Generative AI Course (GIAIC)**, Quarter 3, Assignment 08), the application provides tools for weather forecasting, crop health monitoring, crop scheduling, market price tracking, and more. It features a bilingual interface supporting **English** and **Urdu**, making it accessible to farmers in regions like Pakistan where Urdu is widely spoken.
+The **Smart AgriPak Dashboard** is a web-based application built with [Streamlit](https://agrigrow.streamlit.app/) to support farmers in managing their agricultural operations. Designed as part of a class assignment (likely for the **Generative AI Course (GIAIC)**, Quarter 3, Assignment 08), the application provides tools for weather forecasting, crop health monitoring, crop scheduling, market price tracking, and more. It features a bilingual interface supporting **English** and **Urdu**, making it accessible to farmers in regions like Pakistan where Urdu is widely spoken.
 
 The project integrates real-time weather data via the [OpenWeatherMap API](https://openweathermap.org/) and uses simulated data for crop health and market prices. It is structured modularly, with separate components for each feature, ensuring maintainability and scalability.
 
@@ -10,7 +10,7 @@ The project leverages **Object-Oriented Programming (OOP)** principles to create
 
 ## Features
 
-The Smart Irrigation Dashboard includes the following features, implemented across multiple pages:
+The Smart AgriPak Dashboard includes the following features, implemented across multiple pages:
 
 - **Multilingual Support**: 
   - Switch between English and Urdu interfaces.
@@ -44,7 +44,7 @@ The Smart Irrigation Dashboard includes the following features, implemented acro
 
 The project is organized as follows:
 
-SmartIrrigationDashboard/
+SmartAgriPakDashboard/
 ├── Class_Assignment/
 │   └── assignment_08/
 │       ├── app.py                # Main application entry point
@@ -67,7 +67,7 @@ SmartIrrigationDashboard/
 
 ## OOP Principles in the Code
 
-The Smart Irrigation Dashboard heavily utilizes **Object-Oriented Programming (OOP)** principles to ensure a modular, reusable, and maintainable codebase. Below is a detailed explanation of how OOP concepts are applied:
+The Smart AgriPak Dashboard heavily utilizes **Object-Oriented Programming (OOP)** principles to ensure a modular, reusable, and maintainable codebase. Below is a detailed explanation of how OOP concepts are applied:
 
 ### 1. **Encapsulation**
 - **Description**: Encapsulation bundles data and methods into a single unit (class), restricting direct access to internal state and exposing only necessary interfaces.
@@ -187,7 +187,7 @@ To run the application, ensure you have:
 1. **Clone the Repository** (if hosted on a Git platform):
    ```bash
    git clone <repository-url>
-   cd SmartIrrigationDashboard
+   cd SmartAgriPakDashboard
 
 
 ## Prerequisites
@@ -211,4 +211,4 @@ To run the application, ensure you have:
 1. **Clone the Repository** (if hosted on a Git platform):
    ```bash
    git clone <repository-url>
-   cd SmartIrrigationDashboard
+   cd SmartAgriPakDashboard

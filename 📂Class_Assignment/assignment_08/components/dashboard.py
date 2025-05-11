@@ -114,7 +114,7 @@ class AlertManager:
             return pd.DataFrame()
 
 class DashboardRenderer:
-    """Renders the home and dashboard pages of the Smart Irrigation App."""
+    """Renders the home and dashboard pages of the Smart AgriPak Dashboard."""
     def __init__(self, farm_manager, crops):
         self.farm_manager = farm_manager
         self.crops = crops
@@ -132,9 +132,9 @@ class DashboardRenderer:
             st.experimental_rerun()
 
     def render_home(self):
-        """Render the home page of the Smart Irrigation App."""
+        """Render the home page of the Smart AgriPak App."""
         try:
-            st.title("🌾 Smart Irrigation App")
+            st.title("🌾 Smart AgriPak App")
             st.markdown(f'<div class="header">{get_text("welcome")}</div>', unsafe_allow_html=True)
 
             # Display urgent alerts
@@ -194,7 +194,7 @@ class DashboardRenderer:
     def render_dashboard(self):
         """Render the dashboard page with real-time farm insights."""
         try:
-            st.title("🌱 Smart Irrigation Dashboard")
+            st.title("🌱 Smart AgriPak Dashboard")
             st.markdown(f'<div class="header">{get_text("welcome")}</div>', unsafe_allow_html=True)
 
             # Display urgent alerts
