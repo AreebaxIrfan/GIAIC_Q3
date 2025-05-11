@@ -4,6 +4,7 @@ from datetime import datetime
 import plotly.express as px
 import plotly.figure_factory as ff
 import logging
+import os
 
 # Configure logging
 logging.basicConfig(filename='logs/app.log', level=logging.ERROR, 
