@@ -15,11 +15,85 @@ class MandiPriceClient:
     """Handles fetching of live mandi prices from an external API."""
     def __init__(self, api_url="https://api.agmarknet.gov.in/prices"):
         self.api_url = api_url
-        self.default_prices = [
-            {"crop": "Wheat", "market": "Karachi Mandi", "price_per_kg": 2500},
-            {"crop": "Rice", "market": "Karachi Mandi", "price_per_kg": 3500},
-            {"crop": "Maize", "market": "Karachi Mandi", "price_per_kg": 2000}
-        ]
+        self.default_prices = {
+            "Punjab": [
+                {"crop": "Wheat", "market": "Punjab", "price_per_kg": 70},
+                {"crop": "Rice", "market": "Punjab", "price_per_kg": 100},
+                {"crop": "Maize", "market": "Punjab", "price_per_kg": 55},
+                {"crop": "Cotton", "market": "Punjab", "price_per_kg": 200},
+                {"crop": "Mustard", "market": "Punjab", "price_per_kg": 155},
+                {"crop": "Tomato", "market": "Punjab", "price_per_kg": 50},
+                {"crop": "Potato", "market": "Punjab", "price_per_kg": 40},
+                {"crop": "Onion", "market": "Punjab", "price_per_kg": 60},
+                {"crop": "Chana Dal", "market": "Punjab", "price_per_kg": 130}
+            ],
+            "Sindh": [
+                {"crop": "Wheat", "market": "Sindh", "price_per_kg": 75},
+                {"crop": "Rice", "market": "Sindh", "price_per_kg": 110},
+                {"crop": "Maize", "market": "Sindh", "price_per_kg": 60},
+                {"crop": "Cotton", "market": "Sindh", "price_per_kg": 210},
+                {"crop": "Mustard", "market": "Sindh", "price_per_kg": 160},
+                {"crop": "Tomato", "market": "Sindh", "price_per_kg": 55},
+                {"crop": "Potato", "market": "Sindh", "price_per_kg": 45},
+                {"crop": "Onion", "market": "Sindh", "price_per_kg": 65},
+                {"crop": "Chana Dal", "market": "Sindh", "price_per_kg": 135}
+            ],
+            "Karachi": [
+                {"crop": "Wheat", "market": "Karachi", "price_per_kg": 78},
+                {"crop": "Rice", "market": "Karachi", "price_per_kg": 120},
+                {"crop": "Maize", "market": "Karachi", "price_per_kg": 62},
+                {"crop": "Cotton", "market": "Karachi", "price_per_kg": 215},
+                {"crop": "Mustard", "market": "Karachi", "price_per_kg": 165},
+                {"crop": "Tomato", "market": "Karachi", "price_per_kg": 60},
+                {"crop": "Potato", "market": "Karachi", "price_per_kg": 50},
+                {"crop": "Onion", "market": "Karachi", "price_per_kg": 70},
+                {"crop": "Chana Dal", "market": "Karachi", "price_per_kg": 140}
+            ],
+            "Nawabshah": [
+                {"crop": "Wheat", "market": "Nawabshah", "price_per_kg": 75},
+                {"crop": "Rice", "market": "Nawabshah", "price_per_kg": 115},
+                {"crop": "Maize", "market": "Nawabshah", "price_per_kg": 60},
+                {"crop": "Cotton", "market": "Nawabshah", "price_per_kg": 210},
+                {"crop": "Mustard", "market": "Nawabshah", "price_per_kg": 160},
+                {"crop": "Tomato", "market": "Nawabshah", "price_per_kg": 55},
+                {"crop": "Potato", "market": "Nawabshah", "price_per_kg": 45},
+                {"crop": "Onion", "market": "Nawabshah", "price_per_kg": 65},
+                {"crop": "Chana Dal", "market": "Nawabshah", "price_per_kg": 135}
+            ],
+            "Sukkur": [
+                {"crop": "Wheat", "market": "Sukkur", "price_per_kg": 75},
+                {"crop": "Rice", "market": "Sukkur", "price_per_kg": 115},
+                {"crop": "Maize", "market": "Sukkur", "price_per_kg": 60},
+                {"crop": "Cotton", "market": "Sukkur", "price_per_kg": 210},
+                {"crop": "Mustard", "market": "Sukkur", "price_per_kg": 160},
+                {"crop": "Tomato", "market": "Sukkur", "price_per_kg": 55},
+                {"crop": "Potato", "market": "Sukkur", "price_per_kg": 45},
+                {"crop": "Onion", "market": "Sukkur", "price_per_kg": 65},
+                {"crop": "Chana Dal", "market": "Sukkur", "price_per_kg": 135}
+            ],
+            "Larkana": [
+                {"crop": "Wheat", "market": "Larkana", "price_per_kg": 75},
+                {"crop": "Rice", "market": "Larkana", "price_per_kg": 115},
+                {"crop": "Maize", "market": "Larkana", "price_per_kg": 60},
+                {"crop": "Cotton", "market": "Larkana", "price_per_kg": 210},
+                {"crop": "Mustard", "market": "Larkana", "price_per_kg": 160},
+                {"crop": "Tomato", "market": "Larkana", "price_per_kg": 55},
+                {"crop": "Potato", "market": "Larkana", "price_per_kg": 45},
+                {"crop": "Onion", "market": "Larkana", "price_per_kg": 65},
+                {"crop": "Chana Dal", "market": "Larkana", "price_per_kg": 135}
+            ],
+            "Lahore": [
+                {"crop": "Wheat", "market": "Lahore", "price_per_kg": 70},
+                {"crop": "Rice", "market": "Lahore", "price_per_kg": 100},
+                {"crop": "Maize", "market": "Lahore", "price_per_kg": 55},
+                {"crop": "Cotton", "market": "Lahore", "price_per_kg": 200},
+                {"crop": "Mustard", "market": "Lahore", "price_per_kg": 155},
+                {"crop": "Tomato", "market": "Lahore", "price_per_kg": 50},
+                {"crop": "Potato", "market": "Lahore", "price_per_kg": 40},
+                {"crop": "Onion", "market": "Lahore", "price_per_kg": 60},
+                {"crop": "Chana Dal", "market": "Lahore", "price_per_kg": 130}
+            ]
+        }
 
     def fetch_prices(self, market="Karachi Mandi"):
         """Fetch live mandi prices for a given market."""
@@ -28,10 +102,16 @@ class MandiPriceClient:
             response = requests.get(self.api_url, params=params, timeout=10)
             response.raise_for_status()
             data = response.json()
-            prices = [
-                {"crop": "Wheat", "market": market, "price_per_kg": data.get("wheat_price", 2500)},
-                {"crop": "Rice", "market": market, "price_per_kg": data.get("rice_price", 3500)},
-                {"crop": "Maize", "market": market, "price_per_kg": data.get("maize_price", 2000)}
+            prices =  prices = [
+                {"crop": "Wheat", "market": market, "price_per_kg": data.get("wheat_price", self.default_prices[market][0]["price_per_kg"])},
+                {"crop": "Rice", "market": market, "price_per_kg": data.get("rice_price", self.default_prices[market][1]["price_per_kg"])},
+                {"crop": "Maize", "market": market, "price_per_kg": data.get("maize_price", self.default_prices[market][2]["price_per_kg"])},
+                {"crop": "Cotton", "market": market, "price_per_kg": data.get("cotton_price", self.default_prices[market][3]["price_per_kg"])},
+                {"crop": "Mustard", "market": market, "price_per_kg": data.get("mustard_price", self.default_prices[market][4]["price_per_kg"])},
+                {"crop": "Tomato", "market": market, "price_per_kg": data.get("tomato_price", self.default_prices[market][5]["price_per_kg"])},
+                {"crop": "Potato", "market": market, "price_per_kg": data.get("potato_price", self.default_prices[market][6]["price_per_kg"])},
+                {"crop": "Onion", "market": market, "price_per_kg": data.get("onion_price", self.default_prices[market][7]["price_per_kg"])},
+                {"crop": "Chana Dal", "market": market, "price_per_kg": data.get("chana_dal_price", self.default_prices[market][8]["price_per_kg"])}
             ]
             logging.info(f"Fetched mandi prices for {market}")
             return prices
