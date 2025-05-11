@@ -8,6 +8,8 @@ from components.add_ons import render_add_ons
 from components.consulted import render_consulted
 from components.weather_defense import FarmManager, Crop, render_weather_defense
 from components.crop_health import render_crop_health
+from components.registration import render_registration
+from components.login import render_login
 import numpy as np
 import logging
 import os
@@ -128,22 +130,32 @@ class DashboardApp:
             # Set page configuration
             st.set_page_config(page_title="Smart Irrigation Dashboard", layout="wide")
 
+            # Initialize session state
+            if "logged_in" not in st.session_state:
+                st.session_state.logged_in = False
+            if "page" not in st.session_state:
+                st.session_state.page = "Login"
+            if "language" not in st.session_state:
+                st.session_state.language = "en"
+
             # Load CSS
             load_css()
             
             # Initialize language manager
             self.language_manager = LanguageManager()
             
-            # Initialize crops and farm manager
-            self.crops = CropFactory.create_crops(self.language_manager.language)
-            self.farm_manager = FarmManager(crops=self.crops)
-            self._populate_farm_manager()
-            
-            # Initialize DashboardRenderer
-            self.dashboard_renderer = DashboardRenderer(self.farm_manager, self.crops)
+            # Initialize crops and farm manager (only if logged in)
+            self.crops = []
+            self.farm_manager = None
+            self.dashboard_renderer = None
+            if st.session_state.logged_in:
+                self.crops = CropFactory.create_crops(self.language_manager.language)
+                self.farm_manager = FarmManager(crops=self.crops)
+                self._populate_farm_manager()
+                self.dashboard_renderer = DashboardRenderer(self.farm_manager, self.crops)
             
             # Define navigation pages
-            self.pages = [
+            self.all_pages = [
                 self.language_manager.get_text("home"),
                 self.language_manager.get_text("dashboard"),
                 self.language_manager.get_text("live_mandi"),
@@ -152,7 +164,9 @@ class DashboardApp:
                 self.language_manager.get_text("consulted"),
                 self.language_manager.get_text("crop_calendar"),
                 self.language_manager.get_text("crop_health"),
-                self.language_manager.get_text("weather_defense")
+                self.language_manager.get_text("weather_defense"),
+                "Register",
+                "Login"
             ]
         except Exception as e:
             self.logger.error("Failed to initialize DashboardApp: %s", str(e))
@@ -179,23 +193,52 @@ class DashboardApp:
             )
             self.language_manager.set_language(language_option)
             
-            # Update crops and farm manager if language changes
-            self.crops = CropFactory.create_crops(self.language_manager.language)
-            self.farm_manager = FarmManager(crops=self.crops)
-            self._populate_farm_manager()
-            self.dashboard_renderer = DashboardRenderer(self.farm_manager, self.crops)
-            
+            # Define available pages based on login status
+            if st.session_state.logged_in:
+                available_pages = [p for p in self.all_pages if p not in ["Register", "Login"]]
+                # Add logout button
+                if st.sidebar.button("Logout" if st.session_state.language == "en" else "لاگ آؤٹ"):
+                    st.session_state.logged_in = False
+                    st.session_state.username = None
+                    st.session_state.page = "Login"
+                    st.rerun()
+            else:
+                available_pages = ["Register", "Login"]
+
+            # Ensure current page is valid
+            if st.session_state.page not in available_pages:
+                st.session_state.page = available_pages[0]
+                self.logger.debug(f"Reset page to {st.session_state.page} as it was invalid")
+
             # Render navigation
-            return st.sidebar.radio("Navigation", self.pages, index=0)
+            page = st.sidebar.radio(
+                "Navigation",
+                available_pages,
+                index=available_pages.index(st.session_state.page),
+                key="navigation_radio"
+            )
+            if page != st.session_state.page:
+                st.session_state.page = page
+                self.logger.debug(f"Page changed to {page} via sidebar")
+            return page
         except Exception as e:
             self.logger.error("Failed to render sidebar: %s", str(e))
             st.error("Error rendering sidebar. Please check logs/app.log.")
-            return self.pages[0]
+            return "Login"
 
     def route_page(self, page):
         """Routes to the appropriate page based on user selection."""
         try:
-            if page == self.language_manager.get_text("home"):
+            self.logger.debug(f"Routing to page: {page}, logged_in: {st.session_state.logged_in}")
+            if page == "Register":
+                render_registration()
+            elif page == "Login":
+                render_login()
+            elif not st.session_state.logged_in:
+                st.error("Please log in to access this page." if st.session_state.language == "en" else "براہ کرم اس صفحہ تک رسائی کے لیے لاگ ان کریں۔")
+                st.session_state.page = "Login"
+                render_login()
+            elif page == self.language_manager.get_text("home"):
                 self.dashboard_renderer.render_home()
             elif page == self.language_manager.get_text("dashboard"):
                 self.dashboard_renderer.render_dashboard()
