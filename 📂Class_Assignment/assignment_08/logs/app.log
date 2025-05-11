@@ -1,0 +1,21 @@
+import os
+import logging
+from pathlib import Path
+
+# Create logs directory if it doesn't exist
+log_dir = Path("logs")
+try:
+    log_dir.mkdir(exist_ok=True)
+except PermissionError:
+    logging.basicConfig(level=logging.ERROR)
+    logging.error("Permission denied creating logs directory")
+except Exception as e:
+    logging.basicConfig(level=logging.ERROR)
+    logging.error(f"Error creating logs directory: {str(e)}")
+else:
+    # Configure logging only if directory exists
+    logging.basicConfig(
+        filename=log_dir/"app.log",
+        level=logging.ERROR,
+        format="%(asctime)s - %(levelname)s - %(message)s"
+    )
