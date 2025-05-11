@@ -18,7 +18,7 @@ TEXT = {
         "crop_calendar": "Crop Calendar",
         "crop_health": "Crop Health",
         "weather_defense": "Weather Defense",
-        "live_mandi": "Live Mandi Prices",
+        "live_mandi": "Mandi Prices",
         "summary": "Farm Summary",
         "live_conditions": "Live Conditions",
         "irrigation_status": "Irrigation Status",
