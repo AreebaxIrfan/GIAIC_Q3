@@ -4,10 +4,27 @@ from datetime import datetime
 import plotly.express as px
 import plotly.figure_factory as ff
 import logging
+import os
+import sys
 
-# Configure logging
-logging.basicConfig(filename='logs/app.log', level=logging.ERROR, 
-                    format='%(asctime)s - %(levelname)s - %(message)s')
+# Ensure the logs directory exists
+log_dir = "logs"
+try:
+    if not os.path.exists(log_dir):
+        os.makedirs(log_dir)
+    logging.basicConfig(
+        filename=os.path.join(log_dir, "app.log"),
+        level=logging.ERROR,
+        format="%(asctime)s - %(levelname)s - %(message)s"
+    )
+except (PermissionError, OSError) as e:
+    # Fallback to console logging if file creation fails
+    logging.basicConfig(
+        stream=sys.stderr,
+        level=logging.ERROR,
+        format="%(asctime)s - %(levelname)s - %(message)s"
+    )
+    print(f"Error setting up file logging: {e}. Logging to stderr instead.")
 
 # Language Manager Class for bilingual support
 class LanguageManager:
