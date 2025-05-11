@@ -26,14 +26,6 @@ A bilingual Streamlit web app for weather tracking, crop management, and market 
 - **Design**: Modular, OOP-based architecture
 - **Language Support**: English, Urdu
 
-### 🧩 OOP Principles
-
-| Principle       | Code Example                     | Benefit                          |
-|-----------------|----------------------------------|----------------------------------|
-| Encapsulation   | `FarmManager` bundles crops/alerts | Secure data handling            |
-| Inheritance     | `CustomCrop` extends `Crop`      | Reusable crop models            |
-| Polymorphism    | Handles multiple crop types      | Flexible system expansion       |
-| Abstraction     | `fetch_forecast()` API calls     | Simplifies complex operations    |
 
 ## 🚀 Quick Start
 
