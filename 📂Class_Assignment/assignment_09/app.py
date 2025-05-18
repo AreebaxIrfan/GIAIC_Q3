@@ -299,7 +299,7 @@ class NewsHubApp:
 
         if not is_premium:
             st.warning("Free users see ads. Upgrade to premium for an ad-free experience!")
-            st.image("assets/my_ad.png", caption="Advertisement", use_column_width=True)
+            st.image("assets/my_ad.png", caption="Test", use_column_width=True)
     
         for article in articles:
             st.subheader(article["title"])
