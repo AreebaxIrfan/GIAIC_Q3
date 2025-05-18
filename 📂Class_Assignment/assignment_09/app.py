@@ -300,9 +300,13 @@ class NewsHubApp:
 
         if not is_premium:
             st.warning("Free users see ads. Upgrade to premium for an ad-free experience!")
-            st.image(os.path.join(os.getcwd(), "assets/my_ad.png"))
+            ad_image_path = os.path.join(os.getcwd(), "assets", "my_ad.png")
+            if os.path.exists(ad_image_path):
+                st.image(ad_image_path, caption="Advertisement", use_column_width=True)
+            else:
+                st.image("https://via.placeholder.com/468x60?text=Your+Ad+Here", caption="Ad Placeholder")
 
-    
+
         for article in articles:
             st.subheader(article["title"])
             st.write(article["description"])
