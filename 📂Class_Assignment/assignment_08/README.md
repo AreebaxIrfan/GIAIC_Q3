@@ -88,3 +88,4 @@ The Consultant feature provides expert recommendations to optimize farming pract
  Contributing
 Contributions are welcome! Please fork the repository, create a feature branch, and submit a pull request.
 
+
