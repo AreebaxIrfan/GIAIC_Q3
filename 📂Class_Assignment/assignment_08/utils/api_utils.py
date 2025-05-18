@@ -28,15 +28,15 @@ def get_soil_data(lat, lon):
         logging.error(f"get_soil_data failed: {str(e)}")
         return None
 
-def send_sms_alert(message):
-    account_sid = "USbd9e5275c0238beeffa7b3e56fc070f3"  # Replace with your SID
-    auth_token = "YOUR_TWILIO_AUTH_TOKEN"  # Replace with your token
-    try:
-        client = Client(account_sid, auth_token)
-        client.messages.create(
-            body=message,
-            from_="YOUR_TWILIO_PHONE",  # Replace with your Twilio number
-            to="FARMER_PHONE_NUMBER"  # Replace with farmer's number
-        )
-    except TwilioRestException as e:
-        logging.error(f"send_sms_alert failed: {str(e)}")
+# def send_sms_alert(message):
+#     account_sid = "USbd9e5275c0238beeffa7b3e56fc070f3"  # Replace with your SID
+#     auth_token = "YOUR_TWILIO_AUTH_TOKEN"  # Replace with your token
+#     try:
+#         client = Client(account_sid, auth_token)
+#         client.messages.create(
+#             body=message,
+#             from_="YOUR_TWILIO_PHONE",  # Replace with your Twilio number
+#             to="FARMER_PHONE_NUMBER"  # Replace with farmer's number
+#         )
+#     except TwilioRestException as e:
+#         logging.error(f"send_sms_alert failed: {str(e)}")
