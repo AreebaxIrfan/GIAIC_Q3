@@ -18,16 +18,6 @@ def my_function():
     print("Hello from a function")
 my_function()
 
-#Pass by Refernece vs Value
-def modify_value(x):
-    x=10
-    print("within function",x)
-
-x=20
-print("before function",x)
-modify_value(x)
-print("after function",x)
-
 #Function Argument
 def greeting(name):
     "This is a greeting function"
