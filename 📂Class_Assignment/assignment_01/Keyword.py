@@ -90,7 +90,6 @@ outer()
 print(True and False)
 print(True or False)
 print(not True)
-print(5 is 5)
 print(5 in [1, 2, 3, 4, 5])
 
 #Import & Modules
