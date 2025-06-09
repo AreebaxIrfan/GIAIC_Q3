@@ -11,7 +11,7 @@ def get_random_joke():
             return joke["setup"], joke["punchline"]
         else:
             return "Failed to fetch joke", "Please try again later"
-    except:
+    except Exception as e:
         return "Failed to fetch joke", "Please try again later"  
 
 def main():
