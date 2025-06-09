@@ -1,12 +1,13 @@
-# You want to be safe online and use different passwords for different websites. However, you are forgetful at times and want to make a program that can match which password belongs to which website without storing the actual password!
-
 from hashlib import sha256
 
-def login(email , stored_logins, password_to_check):
+# Constants for reused emails
+EXAMPLE_EMAIL = "example@gmail.com"
+CODE_EMAIL = "code_in_cde@gmail.com"
+STUDENT_EMAIL = "student-of-the-year@gmail.com"
 
+def login(email, stored_logins, password_to_check):
     if stored_logins[email] == hash_password(password_to_check):
         return True
-    
     return False
 
 def hash_password(password):
@@ -14,21 +15,19 @@ def hash_password(password):
 
 def main():
     stored_logins = {
-        "example@gmail.com": "53nisfnishfishhr399922494jn483y34r",
-        "code_in_cde@gmail.com":
-        "8ur9cufh3433bwhSHjuhh",
-        "student-of-the-year@gmail.com":
-        "hduhS8SHush999Y38HSJD38"
+        EXAMPLE_EMAIL: "53nisfnishfishhr399922494jn483y34r",
+        CODE_EMAIL: "8ur9cufh3433bwhSHjuhh",
+        STUDENT_EMAIL: "hduhS8SHush999Y38HSJD38"
     }
-    
-    print(login("example@gmail.com", stored_logins, "word"))
-    print(login("example@gmail.com", stored_logins, "password"))
 
-    print(login("code_in_cde@gmail.com", stored_logins, "karel"))
-    print(login("code_in_cde@gmail.com", stored_logins, "karel"))
+    print(login(EXAMPLE_EMAIL, stored_logins, "word"))
+    print(login(EXAMPLE_EMAIL, stored_logins, "password"))
 
-    print(login("student-of-the-year@gmail.com", stored_logins, "password"))
-    print(login("student-of-the-year@gmail.com", stored_logins, "123!456?789"))
+    print(login(CODE_EMAIL, stored_logins, "karel"))
+    print(login(CODE_EMAIL, stored_logins, "karel"))
+
+    print(login(STUDENT_EMAIL, stored_logins, "password"))
+    print(login(STUDENT_EMAIL, stored_logins, "123!456?789"))
 
 if __name__ == '__main__':
     main()
