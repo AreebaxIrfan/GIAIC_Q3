@@ -16,17 +16,17 @@ if st.button("Generate Money"):
     amount = generate_money()
     st.success(f"You made ${amount}")
 
-
-def fetch_side_hustle():
+def get_side_hustle():
     try:
         response = requests.get("http://127.0.0.1:8000/get_hustle")
         if response.status_code == 200:
             hustles = response.json()
-            return hustles ["side_hustle"]
+            return hustles.get("side_hustle", "No side hustle found")
         else:
-            return { "Create a profile on Upwork"}
-    except:
-        return {"error": "Unable to fetch side hustle"}
+            return {"message": "Create a profile on Upwork"}
+    except Exception as e:
+        return {"error": f"Unable to fetch side hustle: {str(e)}"}
+
     
 st.subheader("Side Hustle Ideas")
 if st.button("Generate Hustle"):
