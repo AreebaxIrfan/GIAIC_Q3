@@ -43,7 +43,7 @@ def fetch_money_quotes():
             return hustles ["money_quote"]
         else:
             return {"Money is a terrible master but an excellent servant"}
-    except:
+    except Exception as e:
         return {"error": "Unable to fetch side hustle"}
     
 st.subheader("Money Quotes")
