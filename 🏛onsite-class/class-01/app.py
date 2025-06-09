@@ -1,11 +1,14 @@
-print('hello world')
+# Define constant
+HELLO_MSG = 'hello world'
+
+print(HELLO_MSG)
 
 def main():
-    print('hello world')
+    print(HELLO_MSG)
 
 # string (str) 
 # integer (int)
-# frozenset  (frozenset) {immuatable}
+# frozenset  (frozenset) {immutable}
 # float 
 # set (mutable but unique type )
 # tuple collection of data immutable
@@ -14,19 +17,18 @@ def main():
 # list ()
 # None (NoneType) {nothing}
 
-#string
-var_string = 'hello world'
+# string
+var_string = HELLO_MSG
 print(var_string)
 
-num:int= 2
+# number examples
+num: int = 2
 print(num)
-float_num : float = 2.33
 
-lift1:list =['apple' ]
+float_num: float = 2.33
 
-tuple1 :tuple= ('apple')
+lift1: list = ['apple']
 
-user_data :dict[str, str] = {'name':'john', 'age':'23'}
+tuple1: tuple = ('apple',)  # Note: tuple of one item needs a comma
 
-
-
+user_data: dict[str, str] = {'name': 'john', 'age': '23'}
