@@ -6,8 +6,7 @@
 # Import & Modules	         import, from, as
 # Object-Oriented (OOP)	     class, object
 
-#Control Flow
-# if, elif, else, for, while, break, continue, pass
+# ------------------- Control Flow -------------------
 x = 10
 y = 20
 
@@ -17,38 +16,38 @@ elif x < y:
     print("x is less than y")
 else:
     print("x is equal to y")
-    # For loop example
+
+# For loop example
 for i in range(5):
     print(f"Iteration {i}")
 
-    # While loop example
+# While loop example
 count = 0
 while count < 5:
     print(f"Count is {count}")
     count += 1
-        # Break example
-    for i in range(10):
-        if i == 5:
-            break
+
+# Break example
+for i in range(10):
+    if i == 5:
+        break
     print(f"Break example iteration {i}")
 
-#Exception Handling
-# try, except, finally
+# ------------------- Exception Handling -------------------
+try:
+    file = open("non_existent_file.txt", "r")
+except FileNotFoundError:
+    print("File not found")
+finally:
+    print("Finished trying to open the file")
 
-    try:
-        file = open("non_existent_file.txt", "r")
-    except FileNotFoundError:
-        print("File not found")
-    finally:
-        print("Finished trying to open the file")
-#Function 
-# def, return
+# ------------------- Function -------------------
 def add(a, b):
     return a + b
 
 print(add(5, 10))
 
-#Class
+# ------------------- Class -------------------
 class Person:
     def __init__(self, name, age):
         self.name = name
@@ -59,20 +58,19 @@ class Person:
 
     def get_age(self):
         return self.age
-    
+
 p = Person("Areeba", 25)
 print(p.get_name())
-print(p.get_age())      
+print(p.get_age())
 
-#Variable & Scope
-# global, nonlocal
+# ------------------- Variable & Scope -------------------
 def my_func():
     global x
     x = 10
     print(x)
 
 my_func()
-print(x , '1')
+print(x, '1')
 
 def outer():
     x = 10
@@ -85,15 +83,12 @@ def outer():
 
 outer()
 
-#Logical & Boolean  
-# True, False, None, and, or, not, is, in
+# ------------------- Logical & Boolean -------------------
 print(True and False)
 print(True or False)
 print(not True)
 print(5 in [1, 2, 3, 4, 5])
 
-#Import & Modules
-# import, from, as  
+# ------------------- Import & Modules -------------------
 import math
 print(math.sqrt(25))
-
