@@ -1,11 +1,3 @@
-# Keywords            :: 	 Example
-# Control Flow               if, elif, else, for, while, break
-# Exception Handling         try, except, finally
-# Function & Class         	 def, return
-# Variable & Scope	         global, nonlocal
-# Import & Modules	         import, from, as
-# Object-Oriented (OOP)	     class, object
-
 # ------------------- Control Flow -------------------
 x = 10
 y = 20
@@ -27,10 +19,8 @@ while count < 5:
     print(f"Count is {count}")
     count += 1
 
-# Break example
-for i in range(10):
-    if i == 5:
-        break
+# Break example (refactored)
+for i in range(5):  # Stop at 5 directly
     print(f"Break example iteration {i}")
 
 # ------------------- Exception Handling -------------------
