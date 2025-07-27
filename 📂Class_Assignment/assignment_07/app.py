@@ -23,7 +23,9 @@ if not GEMINI_API_KEY:
 # SECTION 1: Configuration Class
 # ==============================
 class MediScanConfig:
-    """Manages configuration and constants for MediScan AI Pro."""
+    """Manages configuration and constants for the MediScan AI Pro application."""
+    APP_NAME = "MediScan AI Pro"  # Constant for application name
+
     def __init__(self):
         self.upload_dir = "Uploads"
         self.log_dir = "logs"
@@ -31,7 +33,7 @@ class MediScanConfig:
         self.reminder_file = "reminders.json"
         self.history_file = "history.json"
         self.translations = {
-            "MediScan AI Pro": {"English": "MediScan AI Pro", "Urdu": "میڈی اسکین ای آئی پرو"},
+            self.APP_NAME: {"English": self.APP_NAME, "Urdu": "میڈی اسکین ای آئی پرو"},
             "Login or Register": {"English": "Login or Register", "Urdu": "لاگ ان یا رجسٹر کریں"},
             "Login": {"English": "Login", "Urdu": "لاگ ان"},
             "Register": {"English": "Register", "Urdu": "رجسٹر"},
@@ -59,8 +61,8 @@ class MediScanConfig:
             "No diagnosis done yet.": {"English": "No diagnosis done yet.", "Urdu": "ابھی تک کوئی تشخیص نہیں ہوئی۔"},
             "Export History as TXT": {"English": "Export History as TXT", "Urdu": "تاریخ کو ٹیکسٹ کے طور پر ایکسپورٹ کریں"},
             "Diagnosis Dashboard": {"English": "Diagnosis Dashboard", "Urdu": "تشخیصی ڈیش بورڈ"},
-            "© 2025 | Built with ❤️ by Areeba Irfan | MediScan AI Pro | Powered by Gemini AI": {
-                "English": "© 2025 | Built with ❤️ by Areeba Irfan | MediScan AI Pro | Powered by Gemini AI",
+            f"© 2025 | Built with ❤️ by Areeba Irfan | {APP_NAME} | Powered by Gemini AI": {
+                "English": f"© 2025 | Built with ❤️ by Areeba Irfan | {self.APP_NAME} | Powered by Gemini AI",
                 "Urdu": "© 2025 | عریبہ عرفان کے ذریعہ ❤️ کے ساتھ بنایا گیا | میڈی اسکین ای آئی پرو | جیمنی ای آئی کے ذریعہ تقویت یافتہ"
             },
             "Powered by Gemini AI for accurate diagnoses.": {
@@ -501,7 +503,7 @@ class Tracker:
 # SECTION 9: Main Application Class
 # ==============================
 class MediScanApp:
-    """Main application class for MediScan AI Pro."""
+    """Main application class for the MediScan AI Pro application."""
     def __init__(self):
         self.config = MediScanConfig()
         self.config.setup_directories()
@@ -512,7 +514,7 @@ class MediScanApp:
         self.history_manager = HistoryManager(self.image_processor, self.config)
         self.report_generator = ReportGenerator(self.config)
         self.tracker = Tracker(self.config.reminder_file, self.logger)
-        st.set_page_config(page_title="MediScan AI Pro", layout="wide")
+        st.set_page_config(page_title=self.config.APP_NAME, layout="wide")
         if 'language' not in st.session_state:
             st.session_state['language'] = "English"
         if 'theme' not in st.session_state:
@@ -548,7 +550,7 @@ class MediScanApp:
     def auth_page(self):
         """Renders login and register page."""
         language = st.session_state.get('language', 'English')
-        st.title(self.config.get_translation("MediScan AI Pro", language))
+        st.title(self.config.get_translation(self.config.APP_NAME, language))
         st.markdown(self.config.get_translation("Powered by Gemini AI for accurate diagnoses.", language))
         
         if 'form_type' not in st.session_state:
@@ -694,7 +696,7 @@ class MediScanApp:
         """Renders about page."""
         language = st.session_state.get('language', 'English')
         st.title(self.config.get_translation("About", language))
-        st.write("MediScan AI Pro is a medical image diagnostic tool powered by Gemini AI.")
+        st.write(f"{self.config.APP_NAME} is a medical image diagnostic tool powered by Gemini AI.")
         st.write("- Supports diagnosis for Eye, Skin, and Other body parts")
         st.write("- Provides accurate diagnoses using advanced AI models")
         st.write("- Includes reminders for doctor visits, medication, and rest")
@@ -798,7 +800,7 @@ class MediScanApp:
         """Renders the footer."""
         language = st.session_state.get('language', 'English')
         st.markdown("---")
-        st.markdown(self.config.get_translation("© 2025 | Built with ❤️ by Areeba Irfan | MediScan AI Pro | Powered by Gemini AI", language))
+        st.markdown(self.config.get_translation(f"© 2025 | Built with ❤️ by Areeba Irfan | {self.config.APP_NAME} | Powered by Gemini AI", language))
 
     def run(self):
         """Main method to run the app."""
