@@ -27,23 +27,25 @@ provider = AsyncOpenAI(
     api_key=GEMINI_API_KEY,
     base_url="https://generativelanguage.googleapis.com/v1beta/",
 )
+
 model = OpenAIChatCompletionsModel(
     model="gemini-2.0-flash",
     openai_client=provider,
 )
+
 run_config = RunConfig(
     model=model,
     model_provider=provider,
     tracing_disabled=False,
 )
 
-#  Pydantic BaseModel
+# By using Pydantic
 class UserInfo(BaseModel):
     name: str
     is_premium: bool
-    issue_type: Optional[str] = None
+    issue_type: Optional[str] = None  # Can be "billing", "product", or "technical"
 
-# Product dataclass
+# Define Product dataclass
 @dataclass
 class Product:
     name: str
@@ -61,63 +63,68 @@ async def stationary_items(wrapper: RunContextWrapper[UserInfo]) -> List[Product
         Product(name="notebook", price=290, quantity=20, description="We have 500, 600, or 900 pages notebook available only"),
     ]
 
-# Tool no 2 refund tool is enabled
-def check_is_premium(self, context: Any) -> bool:
-    """Check if the user is premium to enable the refund tool."""
-    if isinstance(context, RunContextWrapper):
-        return context.context.is_premium
-    elif isinstance(context, UserInfo):
-        return context.is_premium
-    return False
-
-# Tool no 3 is_premium == True for checking
-@function_tool(is_enabled=check_is_premium)
+# Tool no 2 for checking if the user is premium or not
+@function_tool(is_enabled=lambda self, context: isinstance(context, (RunContextWrapper, UserInfo)) and context.is_premium)
 async def refund_tool(wrapper: RunContextWrapper[UserInfo]) -> str:
     """Process a refund for the user."""
     if not wrapper.context.is_premium:
         return "Error: Refunds are only available for premium users."
     return f"Refund processed for {wrapper.context.name} (Premium user)."
 
-# guardrail output model
-class RoutingGuardrailOutput(BaseModel):
+# Tool no 2
+@function_tool
+async def restart_service(wrapper: RunContextWrapper[UserInfo]) -> str:
+    """Restart the service for technical issues."""
+    return f"Service restarted for {wrapper.context.name}."
+
+# Define the guardrail output model
+class TechnicalGuardrailOutput(BaseModel):
     is_correct_routing: bool
     reasoning: str
     expected_agent: str
+    restart_service_called: bool
 
-# Guardrail agent to check routing logic
+# Guardrail agent to check technical routing and restart_service
 guardrail_agent = Agent(
-    name="RoutingGuardrailAgent",
+    name="TechnicalGuardrailAgent",
     instructions=(
-        "Analyze the output of the SupportAgent to determine if it correctly routes the query. "
-        "If the user query contains 'refund', the output should indicate a handoff to the BillingAgent. "
-        "If the query is about product information (e.g., name, price, quantity, description), "
-        "the output should indicate a handoff to the ItemInfoAgent. "
-        "Return whether the routing is correct, the reasoning, and the expected agent."
+        "Analyze the output of the SupportAgent to determine if it correctly handles technical queries. "
+        "If the user query has issue_type='technical', the output should indicate a handoff to the TechnicalAgent "
+        "and the restart_service tool should be called. "
+        "Return whether the routing is correct, the reasoning, the expected agent, and whether restart_service was called."
     ),
-    output_type=RoutingGuardrailOutput,
+    output_type=TechnicalGuardrailOutput,
     model=model,
 )
 
+# Output guardrail to validate technical query handling
 @output_guardrail
-async def routing_guardrail(
+async def technical_guardrail(
     ctx: RunContextWrapper[UserInfo], agent: Agent, output: str
 ) -> GuardrailFunctionOutput:
-    # Extract the user query from the context (if available)
-    user_query = ctx.context.issue_type if ctx.context else "unknown"
+    # Extract the user query issue type from the context
+    user_query_issue_type = ctx.context.issue_type if ctx.context else "unknown"
     # Run the guardrail agent to analyze the output
     result = await Runner.run(
         guardrail_agent,
-        input=f"User query issue type: {user_query}\nSupportAgent output: {output}",
+        input=f"User query issue type: {user_query_issue_type}\nSupportAgent output: {output}",
         context=ctx.context,
         run_config=run_config
     )
 
+    # If issue_type is technical, ensure restart_service was called
+    tripwire_triggered = False
+    if user_query_issue_type == "technical":
+        if not result.final_output.is_correct_routing or not result.final_output.restart_service_called:
+            tripwire_triggered = True
+
     return GuardrailFunctionOutput(
         output_info=result.final_output,
-        tripwire_triggered=not result.final_output.is_correct_routing,
+        tripwire_triggered=tripwire_triggered,
     )
 # Agent 1
-item_info_agent = Agent(
+# Item Info Agent for product-related queries
+Item_info_agent = Agent(
     name="ItemInfoAgent",
     instructions=(
         "Handle all queries related to product information, such as name, price, quantity, or description. "
@@ -139,6 +146,17 @@ billing_agent = Agent(
     model=model,
 )
 # Agent 3
+# Technical Agent for technical queries
+technical_agent = Agent(
+    name="TechnicalAgent",
+    instructions=(
+        "Handle technical queries, such as service outages or errors. "
+        "Use the restart_service tool to restart the service when appropriate."
+    ),
+    tools=[restart_service],
+    model=model,
+)
+# Agent 4
 # Support Agent to triage queries and hand off to specialized agents
 support_agent = Agent(
     name="SupportAgent",
@@ -146,18 +164,19 @@ support_agent = Agent(
         "Handle all user queries. "
         "For refund-related queries, hand off to the BillingAgent. "
         "For product-related queries (e.g., product name, price, quantity, description), hand off to the ItemInfoAgent. "
+        "For technical queries (e.g., service issues, errors), hand off to the TechnicalAgent. "
         "If the user is not a premium user and requests a refund, politely say this feature is only for premium users."
     ),
-    tools=[refund_tool, stationary_items],
-    handoffs=[billing_agent, item_info_agent],
-    output_guardrails=[routing_guardrail],  # Attach the output guardrail
+    tools=[refund_tool, stationary_items, restart_service],
+    handoffs=[billing_agent, Item_info_agent, technical_agent],
+    output_guardrails=[technical_guardrail],  # Attach the technical guardrail
     model=model,
 )
 
 async def main():
     user_context = UserInfo(name="Jane Smith", is_premium=False)
 
-    print("💬 Billing Support Agent")
+    print("💬 Support Agent")
     print("Type 'quit' to exit.\n")
 
     while True:
@@ -167,7 +186,12 @@ async def main():
             break
 
         # Update issue type for context
-        user_context.issue_type = "billing" if "refund" in prompt.lower() else "product"
+        if "refund" in prompt.lower():
+            user_context.issue_type = "billing"
+        elif any(keyword in prompt.lower() for keyword in ["service", "error", "technical", "restart"]):
+            user_context.issue_type = "technical"
+        else:
+            user_context.issue_type = "product"
 
         print(f"\nIssue Type Detected: {user_context.issue_type}")
         print("=== Processing Request ===")
@@ -187,14 +211,14 @@ async def main():
                 if event.type == "raw_response_event" and isinstance(event.data, ResponseTextDeltaEvent):
                     print(event.data.delta, end="", flush=True)
 
-            # Get the final output...
-            final_result = result
+            # Get final output
+            final_result =  result
             if final_result.final_output:
                 print(f"\n\nFinal Response: {final_result.final_output}")
             else:
                 print("\n\nNo final output received.")
         except OutputGuardrailTripwireTriggered as e:
-            print(f"\n\nError: Output guardrail tripped - Incorrect routing detected: {e}")
+            print(f"\n\nError: Output guardrail tripped - Incorrect technical query handling: {e}")
             print("Please try again or contact support for assistance.")
         except Exception as e:
             print(f"\n\nError: An unexpected error occurred - {str(e)}")
