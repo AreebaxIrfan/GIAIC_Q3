@@ -1,5 +1,3 @@
-
-
 # 🌟 GIAIC_Q3 Repository
 
 Welcome to the **GIAIC_Q3** repository by **AreebaxIrfan**!  
