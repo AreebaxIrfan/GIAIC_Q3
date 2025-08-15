@@ -1,229 +1,185 @@
-import os
 import asyncio
-from typing import Any, List, Optional
-from agents import (
-    Agent,
-    RunConfig,
-    AsyncOpenAI,
-    OpenAIChatCompletionsModel,
-    Runner,
-    function_tool,
-    RunContextWrapper,
-    GuardrailFunctionOutput,
-    OutputGuardrailTripwireTriggered,
-    output_guardrail,
-)
+from prompt_toolkit import PromptSession
 from dotenv import load_dotenv
-from openai.types.responses import ResponseTextDeltaEvent
+import os
+from agents import Agent, Runner, function_tool, OpenAIChatCompletionsModel, AsyncOpenAI, RunContextWrapper, TResponseInputItem, InputGuardrailTripwireTriggered, input_guardrail, GuardrailFunctionOutput
+from agents.run import RunConfig
+from agents.model_settings import ModelSettings
 from pydantic import BaseModel
-from dataclasses import dataclass
+from typing import List
 
+# Load environment variables
 load_dotenv()
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-if not GEMINI_API_KEY:
-    raise ValueError("GEMINI_API_KEY not found in environment variables. Please set it in .env file.")
 
-provider = AsyncOpenAI(
-    api_key=GEMINI_API_KEY,
-    base_url="https://generativelanguage.googleapis.com/v1beta/",
+# Get Gemini API key
+gemini_api_key = os.getenv("GEMINI_API_KEY")
+if not gemini_api_key:
+    raise ValueError("GEMINI_API_KEY not found, please check your .env file.")
+
+# Configure external client for Gemini API
+external_client = AsyncOpenAI(
+    api_key=gemini_api_key,
+    base_url="https://generativelanguage.googleapis.com/v1beta/openai"
 )
 
+# Configure the model
 model = OpenAIChatCompletionsModel(
     model="gemini-2.0-flash",
-    openai_client=provider,
+    openai_client=external_client
 )
 
-run_config = RunConfig(
+# Configure model settings (removed unsupported parameters)
+model_settings = ModelSettings(
+    temperature=0.7,  # Balanced creativity and coherence
+    parallel_tool_calls=True  # Allow multiple tool calls in one query
+)
+
+# Configure the run settings
+config = RunConfig(
     model=model,
-    model_provider=provider,
-    tracing_disabled=False,
+    model_provider=external_client,
+    tracing_disabled=True,
+    model_settings=model_settings
 )
 
-# By using Pydantic
+# Book database
+BOOK_DATABASE = {
+    "Atomic Habits": {"author": "James Clear", "copies": 3},
+    "Rich Dad Poor Dad": {"author": "Robert T. Kiyosaki", "copies": 2},
+    "Think and Grow Rich": {"author": "Napoleon Hill", "copies": 0},
+    "The 10X Rule": {"author": "Grant Cardone", "copies": 5}
+}
+
+# Pydantic models
 class UserInfo(BaseModel):
     name: str
-    is_premium: bool
-    issue_type: Optional[str] = None  # Can be "billing", "product", or "technical"
+    member_id: int
+    # conversation_history: List[str] = []  # Uncomment for conversation history
 
-# Define Product dataclass
-@dataclass
-class Product:
+class Book(BaseModel):
     name: str
-    price: int
-    quantity: int
-    description: str
+    author: str
+    copies: int
 
-# Tool no 1
-@function_tool
-async def stationary_items(wrapper: RunContextWrapper[UserInfo]) -> List[Product]:
-    """Provide information about available stationary products."""
-    return [
-        Product(name="pencil", price=250, quantity=140, description="Pencil is available in just 2 colors"),
-        Product(name="eraser", price=29, quantity=50, description="We have Dollar brand of eraser only"),
-        Product(name="notebook", price=290, quantity=20, description="We have 500, 600, or 900 pages notebook available only"),
-    ]
-
-# Tool no 2 for checking if the user is premium or not
-@function_tool(is_enabled=lambda self, context: isinstance(context, (RunContextWrapper, UserInfo)) and context.is_premium)
-async def refund_tool(wrapper: RunContextWrapper[UserInfo]) -> str:
-    """Process a refund for the user."""
-    if not wrapper.context.is_premium:
-        return "Error: Refunds are only available for premium users."
-    return f"Refund processed for {wrapper.context.name} (Premium user)."
-
-# Tool no 2
-@function_tool
-async def restart_service(wrapper: RunContextWrapper[UserInfo]) -> str:
-    """Restart the service for technical issues."""
-    return f"Service restarted for {wrapper.context.name}."
-
-# Define the guardrail output model
-class TechnicalGuardrailOutput(BaseModel):
-    is_correct_routing: bool
+class LibraryOutput(BaseModel):
+    is_library_output: bool
     reasoning: str
-    expected_agent: str
-    restart_service_called: bool
 
-# Guardrail agent to check technical routing and restart_service
+# Define guardrail agent
 guardrail_agent = Agent(
-    name="TechnicalGuardrailAgent",
-    instructions=(
-        "Analyze the output of the SupportAgent to determine if it correctly handles technical queries. "
-        "If the user query has issue_type='technical', the output should indicate a handoff to the TechnicalAgent "
-        "and the restart_service tool should be called. "
-        "Return whether the routing is correct, the reasoning, the expected agent, and whether restart_service was called."
-    ),
-    output_type=TechnicalGuardrailOutput,
-    model=model,
+    name='Guardrail Check',
+    instructions='Check if the user is asking about library-related questions. Return is_library_output=True if the query is about books or library services, otherwise False with reasoning.',
+    output_type=LibraryOutput
 )
 
-# Output guardrail to validate technical query handling
-@output_guardrail
-async def technical_guardrail(
-    ctx: RunContextWrapper[UserInfo], agent: Agent, output: str
+@input_guardrail
+async def library_guardrail(
+    ctx: RunContextWrapper[None], agent: Agent, input: str | list[TResponseInputItem]
 ) -> GuardrailFunctionOutput:
-    # Extract the user query issue type from the context
-    user_query_issue_type = ctx.context.issue_type if ctx.context else "unknown"
-    # Run the guardrail agent to analyze the output
-    result = await Runner.run(
-        guardrail_agent,
-        input=f"User query issue type: {user_query_issue_type}\nSupportAgent output: {output}",
-        context=ctx.context,
-        run_config=run_config
-    )
-
-    # If issue_type is technical, ensure restart_service was called
-    tripwire_triggered = False
-    if user_query_issue_type == "technical":
-        if not result.final_output.is_correct_routing or not result.final_output.restart_service_called:
-            tripwire_triggered = True
-
+    result = await Runner.run(guardrail_agent, input, context=ctx.context)
     return GuardrailFunctionOutput(
         output_info=result.final_output,
-        tripwire_triggered=tripwire_triggered,
+        tripwire_triggered=not result.final_output.is_library_output
     )
-# Agent 1
-# Item Info Agent for product-related queries
-Item_info_agent = Agent(
-    name="ItemInfoAgent",
-    instructions=(
-        "Handle all queries related to product information, such as name, price, quantity, or description. "
-        "Use the stationary_items tool to retrieve product details and answer the user's query."
-    ),
-    tools=[stationary_items],
+
+# Search Book Tool
+@function_tool
+async def search_book_tool(book_name: str) -> dict:
+    """Check if a book exists in the library database."""
+    # Case-insensitive search
+    book_name_lower = book_name.lower()
+    matched_book = next((name for name in BOOK_DATABASE if name.lower() == book_name_lower), None)
+    book_exists = matched_book is not None
+    return {
+        "book_name": matched_book or book_name,
+        "exists": book_exists,
+        "message": f"The book '{matched_book or book_name}' {'is' if book_exists else 'is not'} available in the library."
+    }
+
+# Check Availability Tool
+@function_tool
+async def check_availability_tool(book_name: str) -> dict:
+    """Check the number of available copies for a book."""
+    # Case-insensitive search
+    book_name_lower = book_name.lower()
+    matched_book = next((name for name in BOOK_DATABASE if name.lower() == book_name_lower), None)
+    copies = BOOK_DATABASE.get(matched_book, {"copies": 0})["copies"] if matched_book else 0
+    return {
+        "book_name": matched_book or book_name,
+        "copies_available": copies,
+        "message": f"There {'are' if copies > 0 else 'are no'} {copies} copies of '{matched_book or book_name}' available."
+    }
+
+# Define is_enabled function for book_agent
+async def is_book_agent_enabled(self, context: RunContextWrapper[UserInfo]) -> bool:
+    return isinstance(context, RunContextWrapper) and isinstance(context.context, UserInfo) and bool(context.context.member_id)
+
+@function_tool(is_enabled=is_book_agent_enabled)
+async def book_agent(wrapper: RunContextWrapper[UserInfo]) -> list[Book]:
+    """Return a list of all books with their authors and available copies."""
+    return [
+        Book(name=name, author=info["author"], copies=info["copies"])
+        for name, info in BOOK_DATABASE.items()
+    ]
+
+# Dynamic instructions for main agent
+def dynamic_instructions(context: RunContextWrapper[UserInfo], agent: Agent[UserInfo]) -> str:
+    return (
+        f"Hello {context.context.name}, I am your librarian assistant. "
+        "Handle all queries related to the library, such as finding books or checking their availability. "
+        "Use the search_book_tool to check if a book exists, check_availability_tool to see how many copies are available, "
+        "and book_agent to list all books. For queries about a book's existence and availability, use both tools as needed. "
+        "Ensure book names are matched case-insensitively."
+    )
+
+# Define main librarian agent
+main_agent = Agent(
+    name="Librarian Agent",
+    instructions=dynamic_instructions,
     model=model,
+    tools=[book_agent, search_book_tool, check_availability_tool],
+    input_guardrails=[library_guardrail]
 )
-# Agent 2
-# Billing Agent for refund-related queries
-billing_agent = Agent(
-    name="BillingAgent",
-    instructions=(
-        "Handle billing-related queries, including refunds for premium users only. "
-        "Use the refund_tool to process refunds when appropriate. "
-        "If user is not a premium user, politely say this feature is only for premium users."
-    ),
-    tools=[refund_tool],
-    model=model,
-)
-# Agent 3
-# Technical Agent for technical queries
-technical_agent = Agent(
-    name="TechnicalAgent",
-    instructions=(
-        "Handle technical queries, such as service outages or errors. "
-        "Use the restart_service tool to restart the service when appropriate."
-    ),
-    tools=[restart_service],
-    model=model,
-)
-# Agent 4
-# Support Agent to triage queries and hand off to specialized agents
-support_agent = Agent(
-    name="SupportAgent",
-    instructions=(
-        "Handle all user queries. "
-        "For refund-related queries, hand off to the BillingAgent. "
-        "For product-related queries (e.g., product name, price, quantity, description), hand off to the ItemInfoAgent. "
-        "For technical queries (e.g., service issues, errors), hand off to the TechnicalAgent. "
-        "If the user is not a premium user and requests a refund, politely say this feature is only for premium users."
-    ),
-    tools=[refund_tool, stationary_items, restart_service],
-    handoffs=[billing_agent, Item_info_agent, technical_agent],
-    output_guardrails=[technical_guardrail],  # Attach the technical guardrail
-    model=model,
-)
+
+async def get_user_input():
+    session = PromptSession("Enter your question (type 'exit' to quit): ")
+    return await session.prompt_async()
 
 async def main():
-    user_context = UserInfo(name="Jane Smith", is_premium=False)
-
-    print("💬 Support Agent")
-    print("Type 'quit' to exit.\n")
-
+    user_context = UserInfo(name='Areeba Irfan', member_id=231)
+    
     while True:
-        prompt = input("\nHow can I assist you today? ")
-        if prompt.lower() == "quit":
-            print("👋 Exiting chat. Goodbye!")
+        user_input = await get_user_input()
+        
+        # Check for exit condition
+        if user_input.lower() in ['exit', 'quit']:
+            print("Goodbye!")
             break
-
-        # Update issue type for context
-        if "refund" in prompt.lower():
-            user_context.issue_type = "billing"
-        elif any(keyword in prompt.lower() for keyword in ["service", "error", "technical", "restart"]):
-            user_context.issue_type = "technical"
-        else:
-            user_context.issue_type = "product"
-
-        print(f"\nIssue Type Detected: {user_context.issue_type}")
-        print("=== Processing Request ===")
-
-        # Run the agent with streaming
-        result = Runner.run_streamed(
-            support_agent,
-            input=prompt,
-            context=user_context,
-            run_config=run_config
-        )
-
-        # Stream raw response events
+            
         try:
-            print("Agent: ", end="", flush=True)
-            async for event in result.stream_events():
-                if event.type == "raw_response_event" and isinstance(event.data, ResponseTextDeltaEvent):
-                    print(event.data.delta, end="", flush=True)
-
-            # Get final output
-            final_result =  result
-            if final_result.final_output:
-                print(f"\n\nFinal Response: {final_result.final_output}")
-            else:
-                print("\n\nNo final output received.")
-        except OutputGuardrailTripwireTriggered as e:
-            print(f"\n\nError: Output guardrail tripped - Incorrect technical query handling: {e}")
-            print("Please try again or contact support for assistance.")
+            result = await Runner.run(
+                main_agent,
+                user_input,
+                run_config=config,
+                context=user_context
+            )
+            print(result.final_output)
+            # Optionally store conversation history
+            # user_context.conversation_history.append(user_input)
+        except InputGuardrailTripwireTriggered:
+            print("Query is not library-related. Please ask about books or library services.")
         except Exception as e:
-            print(f"\n\nError: An unexpected error occurred - {str(e)}")
+            if "429" in str(e):
+                print("API quota exceeded. Please check your Gemini API plan and billing details at https://cloud.google.com/vertex-ai/docs/quotas.")
+            elif "400" in str(e):
+                print("Invalid API request. Please check the model configuration and try again.")
+            else:
+                print(f"An error occurred: {e}")
 
-        print("=== Request Complete ===")
+# Rebuild Pydantic models if necessary
+Book.model_rebuild()
+UserInfo.model_rebuild()
+LibraryOutput.model_rebuild()
 
 if __name__ == "__main__":
     asyncio.run(main())
