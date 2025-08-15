@@ -38,7 +38,7 @@ model_settings = ModelSettings(
 config = RunConfig(
     model=model,
     model_provider=external_client,
-    tracing_disabled=True,
+    tracing_disabled=False,
     model_settings=model_settings
 )
 
