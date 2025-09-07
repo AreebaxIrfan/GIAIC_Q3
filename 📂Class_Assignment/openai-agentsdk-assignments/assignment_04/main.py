@@ -18,6 +18,9 @@ from openai.types.responses import ResponseTextDeltaEvent
 from pydantic import BaseModel
 from dataclasses import dataclass
 
+# ==============================
+# Setup
+# ==============================
 load_dotenv()
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 if not GEMINI_API_KEY:
@@ -39,13 +42,14 @@ run_config = RunConfig(
     tracing_disabled=False,
 )
 
-# By using Pydantic
+# ==============================
+# Context and Data Models
+# ==============================
 class UserInfo(BaseModel):
     name: str
     is_premium: bool
-    issue_type: Optional[str] = None  # Can be "billing", "product", or "technical"
+    issue_type: Optional[str] = None  # "billing", "product", or "technical"
 
-# Define Product dataclass
 @dataclass
 class Product:
     name: str
@@ -53,7 +57,9 @@ class Product:
     quantity: int
     description: str
 
-# Tool no 1
+# ==============================
+# Tools
+# ==============================
 @function_tool
 async def stationary_items(wrapper: RunContextWrapper[UserInfo]) -> List[Product]:
     """Provide information about available stationary products."""
@@ -63,7 +69,6 @@ async def stationary_items(wrapper: RunContextWrapper[UserInfo]) -> List[Product
         Product(name="notebook", price=290, quantity=20, description="We have 500, 600, or 900 pages notebook available only"),
     ]
 
-# Tool no 2 for checking if the user is premium or not
 @function_tool(is_enabled=lambda self, context: isinstance(context, (RunContextWrapper, UserInfo)) and context.is_premium)
 async def refund_tool(wrapper: RunContextWrapper[UserInfo]) -> str:
     """Process a refund for the user."""
@@ -71,20 +76,20 @@ async def refund_tool(wrapper: RunContextWrapper[UserInfo]) -> str:
         return "Error: Refunds are only available for premium users."
     return f"Refund processed for {wrapper.context.name} (Premium user)."
 
-# Tool no 2
 @function_tool
 async def restart_service(wrapper: RunContextWrapper[UserInfo]) -> str:
     """Restart the service for technical issues."""
     return f"Service restarted for {wrapper.context.name}."
 
-# Define the guardrail output model
+# ==============================
+# Guardrail Setup
+# ==============================
 class TechnicalGuardrailOutput(BaseModel):
     is_correct_routing: bool
     reasoning: str
     expected_agent: str
     restart_service_called: bool
 
-# Guardrail agent to check technical routing and restart_service
 guardrail_agent = Agent(
     name="TechnicalGuardrailAgent",
     instructions=(
@@ -97,14 +102,11 @@ guardrail_agent = Agent(
     model=model,
 )
 
-# Output guardrail to validate technical query handling
 @output_guardrail
 async def technical_guardrail(
     ctx: RunContextWrapper[UserInfo], agent: Agent, output: str
 ) -> GuardrailFunctionOutput:
-    # Extract the user query issue type from the context
     user_query_issue_type = ctx.context.issue_type if ctx.context else "unknown"
-    # Run the guardrail agent to analyze the output
     result = await Runner.run(
         guardrail_agent,
         input=f"User query issue type: {user_query_issue_type}\nSupportAgent output: {output}",
@@ -112,67 +114,97 @@ async def technical_guardrail(
         run_config=run_config
     )
 
-    # If issue_type is technical, ensure restart_service was called
-    tripwire_triggered = False
-    if user_query_issue_type == "technical":
-        if not result.final_output.is_correct_routing or not result.final_output.restart_service_called:
-            tripwire_triggered = True
+    tripwire_triggered = (
+        user_query_issue_type == "technical"
+        and (not result.final_output.is_correct_routing or not result.final_output.restart_service_called)
+    )
 
     return GuardrailFunctionOutput(
         output_info=result.final_output,
         tripwire_triggered=tripwire_triggered,
     )
-# Agent 1
-# Item Info Agent for product-related queries
+
+# ==============================
+# Agents
+# ==============================
 Item_info_agent = Agent(
     name="ItemInfoAgent",
-    instructions=(
-        "Handle all queries related to product information, such as name, price, quantity, or description. "
-        "Use the stationary_items tool to retrieve product details and answer the user's query."
-    ),
+    instructions="Handle all queries related to product information. Use the stationary_items tool.",
     tools=[stationary_items],
     model=model,
 )
-# Agent 2
-# Billing Agent for refund-related queries
+
 billing_agent = Agent(
     name="BillingAgent",
-    instructions=(
-        "Handle billing-related queries, including refunds for premium users only. "
-        "Use the refund_tool to process refunds when appropriate. "
-        "If user is not a premium user, politely say this feature is only for premium users."
-    ),
+    instructions="Handle billing-related queries, including refunds for premium users only. Use the refund_tool.",
     tools=[refund_tool],
     model=model,
 )
-# Agent 3
-# Technical Agent for technical queries
+
 technical_agent = Agent(
     name="TechnicalAgent",
-    instructions=(
-        "Handle technical queries, such as service outages or errors. "
-        "Use the restart_service tool to restart the service when appropriate."
-    ),
+    instructions="Handle technical queries. Use the restart_service tool when appropriate.",
     tools=[restart_service],
     model=model,
 )
-# Agent 4
-# Support Agent to triage queries and hand off to specialized agents
+
 support_agent = Agent(
     name="SupportAgent",
     instructions=(
         "Handle all user queries. "
         "For refund-related queries, hand off to the BillingAgent. "
-        "For product-related queries (e.g., product name, price, quantity, description), hand off to the ItemInfoAgent. "
-        "For technical queries (e.g., service issues, errors), hand off to the TechnicalAgent. "
+        "For product-related queries, hand off to the ItemInfoAgent. "
+        "For technical queries, hand off to the TechnicalAgent. "
         "If the user is not a premium user and requests a refund, politely say this feature is only for premium users."
     ),
     tools=[refund_tool, stationary_items, restart_service],
     handoffs=[billing_agent, Item_info_agent, technical_agent],
-    output_guardrails=[technical_guardrail],  # Attach the technical guardrail
+    output_guardrails=[technical_guardrail],
     model=model,
 )
 
+# ==============================
+# Helper Functions (Refactor)
+# ==============================
+def detect_issue_type(prompt: str) -> str:
+    """Detect issue type from user prompt."""
+    lowered = prompt.lower()
+    if "refund" in lowered:
+        return "billing"
+    elif any(keyword in lowered for keyword in ["service", "error", "technical", "restart"]):
+        return "technical"
+    return "product"
+
+async def handle_request(prompt: str, user_context: UserInfo):
+    """Handle agent streaming, response printing, and error handling."""
+    result = Runner.run_streamed(
+        support_agent,
+        input=prompt,
+        context=user_context,
+        run_config=run_config
+    )
+
+    try:
+        print("Agent: ", end="", flush=True)
+        async for event in result.stream_events():
+            if event.type == "raw_response_event" and isinstance(event.data, ResponseTextDeltaEvent):
+                print(event.data.delta, end="", flush=True)
+
+        if result.final_output:
+            print(f"\n\nFinal Response: {result.final_output}")
+        else:
+            print("\n\nNo final output received.")
+    except OutputGuardrailTripwireTriggered as e:
+        print(f"\n\nError: Output guardrail tripped - {e}")
+        print("Please try again or contact support.")
+    except Exception as e:
+        print(f"\n\nError: Unexpected issue - {str(e)}")
+
+    print("=== Request Complete ===")
+
+# ==============================
+# Main (Simplified)
+# ==============================
 async def main():
     user_context = UserInfo(name="Jane Smith", is_premium=False)
 
@@ -185,45 +217,11 @@ async def main():
             print("👋 Exiting chat. Goodbye!")
             break
 
-        # Update issue type for context
-        if "refund" in prompt.lower():
-            user_context.issue_type = "billing"
-        elif any(keyword in prompt.lower() for keyword in ["service", "error", "technical", "restart"]):
-            user_context.issue_type = "technical"
-        else:
-            user_context.issue_type = "product"
-
+        user_context.issue_type = detect_issue_type(prompt)
         print(f"\nIssue Type Detected: {user_context.issue_type}")
         print("=== Processing Request ===")
 
-        # Run the agent with streaming
-        result = Runner.run_streamed(
-            support_agent,
-            input=prompt,
-            context=user_context,
-            run_config=run_config
-        )
-
-        # Stream raw response events
-        try:
-            print("Agent: ", end="", flush=True)
-            async for event in result.stream_events():
-                if event.type == "raw_response_event" and isinstance(event.data, ResponseTextDeltaEvent):
-                    print(event.data.delta, end="", flush=True)
-
-            # Get final output
-            final_result =  result
-            if final_result.final_output:
-                print(f"\n\nFinal Response: {final_result.final_output}")
-            else:
-                print("\n\nNo final output received.")
-        except OutputGuardrailTripwireTriggered as e:
-            print(f"\n\nError: Output guardrail tripped - Incorrect technical query handling: {e}")
-            print("Please try again or contact support for assistance.")
-        except Exception as e:
-            print(f"\n\nError: An unexpected error occurred - {str(e)}")
-
-        print("=== Request Complete ===")
+        await handle_request(prompt, user_context)
 
 if __name__ == "__main__":
     asyncio.run(main())
