@@ -24,7 +24,7 @@ def erase_objects(canvas, eraser):
             canvas.set_color(overlapping_object, 'white')
 
 def main():
-    canvas = Canvas(CANVAS_WIDTH, CANVAS_HEIGHT)  # ✅ renamed variable
+    canvas = Canvas(CANVAS_WIDTH, CANVAS_HEIGHT)
 
     num_rows = CANVAS_HEIGHT // CELL_SIZE
     num_cols = CANVAS_WIDTH // CELL_SIZE
@@ -36,7 +36,7 @@ def main():
             right_x = left_x + CELL_SIZE
             bottom_y = top_y + CELL_SIZE
 
-            canvas.create_rectangle(left_x, top_y, right_x, bottom_y, 'blue')  # added color arg
+            canvas.create_rectangle(left_x, top_y, right_x, bottom_y, 'blue')
 
     canvas.wait_for_click()
 
