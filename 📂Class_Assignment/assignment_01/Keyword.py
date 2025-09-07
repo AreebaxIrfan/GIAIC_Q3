@@ -11,16 +11,19 @@ else:
 
 # For loop example
 for i in range(5):
-    print(f"Iteration {i}")
+    print(f"For loop iteration {i}")
 
 # While loop example
 count = 0
 while count < 5:
-    print(f"Count is {count}")
+    print(f"While loop count is {count}")
     count += 1
 
-# Break example (refactored)
-for i in range(5):  # Stop at 5 directly
+# Break example
+for i in range(10):
+    if i == 5:   # break when i reaches 5
+        print("Breaking the loop at i = 5")
+        break
     print(f"Break example iteration {i}")
 
 # ------------------- Exception Handling -------------------
@@ -35,7 +38,7 @@ finally:
 def add(a, b):
     return a + b
 
-print(add(5, 10))
+print("Add function result:", add(5, 10))
 
 # ------------------- Class -------------------
 class Person:
@@ -50,35 +53,37 @@ class Person:
         return self.age
 
 p = Person("Areeba", 25)
-print(p.get_name())
-print(p.get_age())
+print("Person name:", p.get_name())
+print("Person age:", p.get_age())
 
 # ------------------- Variable & Scope -------------------
+x = 10   # global variable
+
 def my_func():
     global x
-    x = 10
-    print(x)
+    x = 50   # change global x so it's not constant
+    print("Inside my_func, x =", x)
 
 my_func()
-print(x, '1')
+print("Outside my_func, global x =", x)
 
 def outer():
     x = 10
     def inner():
         nonlocal x
-        x = 20
-        print(x)
+        x = 20   # modifies the outer function's variable
+        print("Inside inner, x =", x)
     inner()
-    print(x)
+    print("Inside outer after inner call, x =", x)
 
 outer()
 
 # ------------------- Logical & Boolean -------------------
-print(True and False)
-print(True or False)
-print(not True)
-print(5 in [1, 2, 3, 4, 5])
+print("Logical and:", True and False)
+print("Logical or:", True or False)
+print("Logical not:", not True)
+print("Membership test (5 in list):", 5 in [1, 2, 3, 4, 5])
 
 # ------------------- Import & Modules -------------------
 import math
-print(math.sqrt(25))
+print("Square root of 25:", math.sqrt(25))
