@@ -52,5 +52,5 @@ result = Runner.run_sync(
     run_config= config
     )
 
-print(f"\nAgent's Response:\n")
-print(f"{result.final_output}\n")
+print("\nAgent's Response:\n")
+print("{result.final_output}\n")
