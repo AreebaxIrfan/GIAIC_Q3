@@ -23,9 +23,3 @@ print("Date:", date2)
 import datetime
 x = datetime.datetime.now()
 print(x)
-
-a = datetime.datetime(2025 , 10 , 35)
-print(a.strftime("%A"))
-print(a.strftime("%Y"))
-print(a.strftime("%f"))
-print(a.strftime("%B"))

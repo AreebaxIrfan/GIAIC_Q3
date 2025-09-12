@@ -79,9 +79,7 @@ def outer():
 outer()
 
 # ------------------- Logical & Boolean -------------------
-print("Logical and:", True and False)
-print("Logical or:", True or False)
-print("Logical not:", not True)
+
 print("Membership test (5 in list):", 5 in [1, 2, 3, 4, 5])
 
 # ------------------- Import & Modules -------------------

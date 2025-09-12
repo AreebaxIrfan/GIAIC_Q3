@@ -17,7 +17,6 @@ print(my_set)
 #To add one item to a set use the add() method.
 #To add more than one item to a set use the update() method.
 #Add an item to a set, using the add() method:
-my_set.pop("orange")
 my_set.discard("cherry")
 my_set.add("orange")
 my_set.remove("orange")

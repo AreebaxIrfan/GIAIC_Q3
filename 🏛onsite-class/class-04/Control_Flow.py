@@ -104,9 +104,3 @@ print("my_set =", my_set)
 print("my_set2 =", my_set2)
 print("type of my_set2 =", type(my_set2))
 
-# Sets are unordered and unindexable
-my_Set: set = {1, 2, 3, 4, 5}
-try:
-    my_Set[0] = 10
-except TypeError as e:
-    print("Error:", e)
