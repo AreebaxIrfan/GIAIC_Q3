@@ -25,11 +25,12 @@ async def main():
         instructions='You can should generated a poetry in roman urdu in every user input according to the user input',
         model=OpenAIChatCompletionsModel(model=MODEL,openai_client=client),
     )
-    input_user= input('Enter your query:')
+    input_user = await asyncio.to_thread(input, "Enter your query: ")
     result = await Runner.run(
         agent,
-        "hi"
+        input_user
     )
+
     print(result.final_output)
 
 if __name__ == '__main__':
