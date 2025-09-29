@@ -212,7 +212,7 @@ async def main():
     print("Type 'quit' to exit.\n")
 
     while True:
-        prompt = input("\nHow can I assist you today? ")
+        prompt = await asyncio.to_thread(input, "\nHow can I assist you today? ")
         if prompt.lower() == "quit":
             print("👋 Exiting chat. Goodbye!")
             break
